@@ -1,6 +1,12 @@
 class Pinboard {
 	int width
 	int height
-	static belongsTo = User
 	static hasMany = [ items: Item ]
+
+	static belongsTo = User
+
+	static constraints = {
+		width(min: 1, nullable: false)
+		height(min: 1, nullable: false)
+	}
 }
