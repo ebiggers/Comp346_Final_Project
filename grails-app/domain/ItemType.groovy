@@ -1,9 +1,9 @@
 class ItemType {
 	String typeName
-	String defaultIcon
+	String defaultIconPath
 
 	static constraints = {
 		typeName(nullable: false, blank: false, unique: true)
-		defaultIcon(nullable: false, blank: false)
+		defaultIconPath(nullable: false, blank: false)
 	}
 }
