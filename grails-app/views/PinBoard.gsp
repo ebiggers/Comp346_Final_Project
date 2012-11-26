@@ -50,19 +50,21 @@
                     ctx.drawImage(default_img,x,y,12,12);
                 };
                 default_img.src = 'file_default.png';
-                try{
-                    $.ajax({
-                        type: "POST",
-                        url: "${g.createLink(controller: 'PinBoard', action: 'makeNewItem')}",
-                        data: {xCoordinate: x, yCoordinate: y, file: selectedFiles[0]},
-                        success: function(response) {
-                            alert("Saved");
-                        }
-                    });
-                }
-                catch(err){
-                    alert(err)
-                }
+                /*
+                  try{
+                      $.ajax({
+                          type: "POST",
+                          url: "${g.createLink(controller: 'PinBoard', action: 'makeNewItem')}",
+                          data: {xCoordinate: x, yCoordinate: y, file: selectedFiles[0]},
+                          success: function(response) {
+                              alert("Saved");
+                          }
+                      });
+                  }
+                  catch(err){
+                      alert(err)
+                  }
+                */
             }
 
             function getMousePos(can, evt) {

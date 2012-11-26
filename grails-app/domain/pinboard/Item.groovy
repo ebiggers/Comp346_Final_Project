@@ -1,3 +1,5 @@
+package pinboard
+
 class Item {
 	int x_pos
 	int y_pos

@@ -1,3 +1,5 @@
+package pinboard
+
 class ItemType {
 	String typeName
 	String defaultIconPath

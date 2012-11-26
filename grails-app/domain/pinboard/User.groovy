@@ -1,3 +1,5 @@
+package pinboard
+
 class User {
 	String username
 	byte[] password_hash

@@ -1,3 +1,5 @@
+package pinboard
+
 class PinBoard {
 	int width
 	int height
