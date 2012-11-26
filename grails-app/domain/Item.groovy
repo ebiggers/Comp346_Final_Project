@@ -5,7 +5,7 @@ class Item {
 	String name
 	String dataPath
 
-	static belongsTo = Pinboard
+	static belongsTo = PinBoard
 
 	static constraints = {
 		x_pos(nullable: false, min: 0)

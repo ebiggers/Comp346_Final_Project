@@ -1,4 +1,4 @@
-class Pinboard {
+class PinBoard {
 	int width
 	int height
 	static hasMany = [ items: Item ]
