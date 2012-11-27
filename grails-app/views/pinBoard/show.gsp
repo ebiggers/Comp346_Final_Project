@@ -88,6 +88,16 @@
     </script>
   </head>
   <body>
+    <div id="login_hdr">
+      <span id="hello">
+        Hello, ${session.user.username}.  Welcome to your Pinboard.
+      </span>
+      <span id="logout">
+        <a href="${g.createLink(controller: 'user', action: 'logout')}">
+          Logout
+        </a>
+      </span>
+    </div>
     <canvas id="pinboard_canvas" width="1280" height="800">
       Your browser does not support the HTML 5 canvas tag
     </canvas>
