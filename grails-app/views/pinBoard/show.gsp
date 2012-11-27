@@ -59,6 +59,9 @@
                     // <input> of type "file")
                     var data = new FormData();
                     data.append("file", files[0]);
+                    data.append("x_pos", x);
+                    data.append("y_pos", y);
+                    data.append("pinboard_id", ${pinboard.id});
                     $.ajax({
                         url: "${g.createLink(controller: 'PinBoard', action: 'uploadFile')}",
                         data: data,
@@ -90,7 +93,7 @@
   <body>
     <div id="login_hdr">
       <div id="hello">
-        Hello, ${session.user.username}.  Welcome to your Pinboard.
+        Hello, ${user.username}.  Welcome to your Pinboard.
         <span id="logout">
           <a href="${g.createLink(controller: 'user', action: 'logout')}">
             Logout

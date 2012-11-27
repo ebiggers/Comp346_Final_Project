@@ -39,7 +39,7 @@ class UserController {
 			flash.message = "Invalid username and/or password."
 			return redirect(action: "create")
 		}
-		session.user = u
+		session.user = u.id
 		flash.message = "Hello ${username}."
 		return redirect(controller: "pinBoard", action: "show")
 	}
@@ -55,7 +55,7 @@ class UserController {
 
 		def user = User.findByUsernameAndPasswordHash(username, password_hash)
 		if (user) {
-			session.user = user
+			session.user = user.id
 			flash.message = "Hello ${username}."
 			return redirect(controller: "pinBoard", action: "show")
 		} else {
@@ -65,7 +65,8 @@ class UserController {
 	}
 
 	def logout() {
-		flash.message = "Goodbye ${session.user.username}.  See you soon!"
+		User user = User.get(session.user)
+		flash.message = "Goodbye ${user.username}.  See you soon!"
 		session.user = null
 		return redirect(action: "login")
 	}

@@ -9,6 +9,7 @@ class User {
     User(String username, String password) {
         this.username = username
         this.passwordHash = password.encodeAsMD5()
+		this.addToPinboards(new PinBoard())
     }
 
 	static constraints = {
