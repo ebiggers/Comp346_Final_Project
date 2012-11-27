@@ -1,26 +1,19 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<!DOCTYPE HTML>
 <html>
   <head>
     <title>Drag and Drop Test</title>
-    <style type="text/css">
-      #pinboard_canvas {
-          // Beware: The CSS width and height of the canvas are NOT equivalent
-          // to the "width" and "height" attributes of the canvas.
-          width: 1280px;
-          height: 800px;
-
-          border: 1px black solid;
-      }
-    </style>
-    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
-    <script>
+    <meta name="layout" content="main">
+    <link rel="stylesheet" href="${resource(dir: 'css', file: 'show.css')}" type="text/css">
+    <r:require module="jquery"/>
+    <r:script>
         $(document).ready(function(){
 
             // The HTML5 canvas for a pinboard, and its 2-dimensional rendering
             // context.
             var canvas = document.getElementById("pinboard_canvas");
             var ctx = canvas.getContext("2d");
+            var icon_size_x = 20;
+            var icon_size_y = 20;
 
             // Both dragenter and dragover must be cancelled for drop to work
             // correctly???
@@ -40,7 +33,7 @@
 
                 files = e.dataTransfer.files;
 
-                var mousePos = getMousePos(canvas, e)
+                var mousePos = getMousePos(canvas, e);
                 var x = mousePos.x;
                 var y = mousePos.y;
 
@@ -50,7 +43,7 @@
 
                     var default_img = new Image();
                     default_img.onload = function() {
-                        ctx.drawImage(default_img, x, y, 60, 60);
+                        ctx.drawImage(default_img, x, y, icon_size_x, icon_size_y);
                     };
                     default_img.src = "${g.resource(dir: "images", file: "Binary-icon.png")}";
 
@@ -84,16 +77,16 @@
                 return {
                     // window.devicePixelRatio is used to correct the Retina screen
                     x: (e.clientX - rect.left) /(window.devicePixelRatio*window.devicePixelRatio),
-                    y: (e.clientY - rect.top) /(window.devicePixelRatio*window.devicePixelRatio),
+                    y: (e.clientY - rect.top) /(window.devicePixelRatio*window.devicePixelRatio)
                 };
             }
         });
-    </script>
+    </r:script>
   </head>
   <body>
     <div id="login_hdr">
       <div id="hello">
-        Hello, ${user.username}.  Welcome to your Pinboard.
+        <span>Hello, ${user.username}.  Welcome to your Pinboard.</span>
         <span id="logout">
           <a href="${g.createLink(controller: 'user', action: 'logout')}">
             Logout
@@ -104,8 +97,10 @@
         Simply drag files onto your pinboard to upload them!
       </div>
     </div>
-    <canvas id="pinboard_canvas" width="1280" height="800">
-      Your browser does not support the HTML 5 canvas tag
-    </canvas>
+    <div id="main">
+        <canvas id="pinboard_canvas">
+          Your browser does not support the HTML 5 canvas tag
+        </canvas>
+    </div>
   </body>
 </html>
