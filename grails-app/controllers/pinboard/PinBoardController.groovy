@@ -65,7 +65,7 @@ class PinBoardController {
 
 		String pinboardFolderName = userFolderName + "/" + pinboard_id
 		File pinboardFolder = new File(pinboardFolderName)
-		if (!pinboardFolder()) {
+		if (!pinboardFolder.exists()) {
 			pinboardFolder.mkdir()
 		}
 
