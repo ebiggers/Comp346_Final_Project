@@ -50,9 +50,9 @@
 
                     var default_img = new Image();
                     default_img.onload = function() {
-                        ctx.drawImage(default_img, x, y, 90, 60);
+                        ctx.drawImage(default_img, x, y, 60, 60);
                     };
-                    default_img.src = 'file_default.png';
+                    default_img.src = "${g.resource(dir: "images", file: "Binary-icon.png")}";
 
                     // The FormData object simulates submitting a form using the
                     // form-data/multipart enctype (as would be used for an
@@ -60,7 +60,7 @@
                     var data = new FormData();
                     data.append("file", files[0]);
                     $.ajax({
-                        url: "${g.createLink(controller: 'PinBoard', action: 'makeNewItem')}",
+                        url: "${g.createLink(controller: 'PinBoard', action: 'uploadFile')}",
                         data: data,
                         cache: false,
                         contentType: false, // Must be false when using FormData
@@ -89,14 +89,17 @@
   </head>
   <body>
     <div id="login_hdr">
-      <span id="hello">
+      <div id="hello">
         Hello, ${session.user.username}.  Welcome to your Pinboard.
-      </span>
-      <span id="logout">
-        <a href="${g.createLink(controller: 'user', action: 'logout')}">
-          Logout
-        </a>
-      </span>
+        <span id="logout">
+          <a href="${g.createLink(controller: 'user', action: 'logout')}">
+            Logout
+          </a>
+        </span>
+      </div>
+      <div id="messages">
+        Simply drag files onto your pinboard to upload them!
+      </div>
     </div>
     <canvas id="pinboard_canvas" width="1280" height="800">
       Your browser does not support the HTML 5 canvas tag

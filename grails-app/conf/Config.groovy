@@ -29,6 +29,8 @@ grails.mime.types = [
     xml:           ['text/xml', 'application/xml']
 ]
 
+pinboard.upload_dir = '/tmp/pinboard'
+
 // URL Mapping Cache Max Size, defaults to 5000
 //grails.urlmapping.cache.maxsize = 1000
 
