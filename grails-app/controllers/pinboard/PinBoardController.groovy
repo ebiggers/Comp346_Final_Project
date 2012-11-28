@@ -40,9 +40,10 @@ class PinBoardController {
 
 	def uploadFile() {
 
-		int x_pos = params.x_pos as Long
-		int y_pos = params.x_pos as Long
-		int pinboard_id = params.pinboard_id as Long
+		int x_pos = new Double(params.x_pos).intValue()  //casting to the right type here
+		int y_pos = new Double(params.y_pos).intValue()
+		int pinboard_id = new Integer(params.pinboard_id).intValue()
+
 
 		User u = User.get(session.user)
 
