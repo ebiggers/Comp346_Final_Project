@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
-<html>
+<!DOCTYPE html>
   <head>
     <title>Drag and Drop Test</title>
     <meta name="layout" content="main">
@@ -21,6 +21,14 @@
             canvas.addEventListener("dragenter", StopEvent, false);
             canvas.addEventListener("dragover", StopEvent, false);
             canvas.addEventListener("drop", OnDrop, false);
+            canvas.addEventListener('mousedown', OnClick, true);
+
+            function OnClick(e){
+                var mousePos = getMousePos(canvas, e);
+                var x = mousePos.x;
+                var y = mousePos.y;
+                alert("x: "+x+" y:"+y);
+            }
 
             function StopEvent(e) {
                 e.stopPropagation();
