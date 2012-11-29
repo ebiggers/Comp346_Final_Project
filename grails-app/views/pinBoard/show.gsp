@@ -4,6 +4,15 @@
     <title>Drag and Drop Test</title>
     <meta name="layout" content="main">
     <link rel="stylesheet" href="${resource(dir: 'css', file: 'show.css')}" type="text/css">
+    <style>
+      #pinboard_canvas {
+        /* Beware: The CSS width and height of the canvas are NOT equivalent
+         * to the "width" and "height" attributes of the canvas. */
+          width: ${pinboard.width}px;
+          height: ${pinboard.height}px;
+          border: 1px black solid;
+      }
+    </style>
     <r:require module="jquery"/>
     <r:script>
         $(document).ready(function(){
@@ -14,6 +23,7 @@
             var ctx = canvas.getContext("2d");
             var icon_size_x = 20;
             var icon_size_y = 20;
+            var items = [];
 
             // Both dragenter and dragover must be cancelled for drop to work
             // correctly???
@@ -23,11 +33,27 @@
             canvas.addEventListener("drop", OnDrop, false);
             canvas.addEventListener('mousedown', OnClick, true);
 
+            function item (x,y,w,h){
+                this.x = x || 0;
+                this.y = y || 0;
+                this.w = w || icon_size_x;
+                this.h = h || icon_size_y;
+            }
+
             function OnClick(e){
                 var mousePos = getMousePos(canvas, e);
-                var x = mousePos.x;
-                var y = mousePos.y;
-                alert("x: "+x+" y:"+y);
+                var mx = mousePos.x;
+                var my = mousePos.y;
+                var l = items.length;
+
+                alert('here');
+                for (var i = l-1; i >= 0; i--) {
+                    if (items[i].x < mx && items[i].y < my && (items[i].x+items[i].w) > mx && (items[i].y+items[i].h) > my ){
+                    alert("selected");
+                    return;
+                    }
+                }
+                alert("x: "+mx+" y:"+my + " Length:" + l);
             }
 
             function StopEvent(e) {
@@ -45,6 +71,8 @@
                 var x = mousePos.x;
                 var y = mousePos.y;
 
+                //alert("x: "+x+" y:"+y);
+
                 // If a file was dropped, put a default file icon on the
                 // pinboard, then upload the file using an AJAX call (POST)
                 if (files.length == 1) {
@@ -54,6 +82,10 @@
                         ctx.drawImage(default_img, x, y, icon_size_x, icon_size_y);
                     };
                     default_img.src = "${g.resource(dir: "images", file: "Binary-icon.png")}";
+
+                    var l = items.length;
+                    items[(l+1)] = new item(x,y);
+                    alert(items.length);
 
                     // The FormData object simulates submitting a form using the
                     // form-data/multipart enctype (as would be used for an
@@ -106,7 +138,7 @@
       </div>
     </div>
     <div id="main">
-        <canvas id="pinboard_canvas">
+        <canvas id="pinboard_canvas" width="${pinboard.width}" height="${pinboard.height}">
           Your browser does not support the HTML 5 canvas tag
         </canvas>
     </div>
