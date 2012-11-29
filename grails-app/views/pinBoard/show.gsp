@@ -124,6 +124,7 @@
                 var i = getItemFromMousePos(e);
                 if (i != -1) {
                     var item = items[i];
+                    console.log("Downloading item (id = %d)", item.id);
                     $.ajax({
                         url: "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}",
                         type: 'GET',

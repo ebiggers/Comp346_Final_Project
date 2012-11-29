@@ -119,7 +119,7 @@ class PinBoardController {
 
     def downloadFile() {
         User u = User.get(session.user)
-        int item_id = new Integer(params.Item_id).intValue()
+        int item_id = new Integer(params.item_id).intValue()
         PinBoard pinboard = getCurrentPinBoard(u)
         Item item = pinboard.getItemFromId(item_id)
 
