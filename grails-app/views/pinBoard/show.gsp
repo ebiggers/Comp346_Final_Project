@@ -124,14 +124,12 @@
                 var i = getItemFromMousePos(e);
                 if (i != -1) {
                     selectedItem = items[i];
-                    $.ajax({
-                        url: "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}",
-                        type: 'GET',
-                        data: { "Pinboard_id" : "${pinboard.id}" , "Item_id" : selectedItem.id},
-                        success: function(data) {
+                    var pinboard_id = "${pinboard.id}"
+                    var item_id = selectedItem.id
+                    var controller = "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}";
+                    var link = controller + "?" + "Item_id=" + item_id + "&" + "Pinboard_id=" + pinboard_id
+                    window.open(link)
 
-                        }
-                    });
                 }
             };
 

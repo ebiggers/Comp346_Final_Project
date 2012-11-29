@@ -124,6 +124,7 @@ class PinBoardController {
 	}
 
     def downloadFile() {
+        print("called")
         User u = User.get(session.user)
         int pinboard_id = new Integer(params.Pinboard_id).intValue()
         int item_id = new Integer(params.Item_id).intValue()
@@ -137,8 +138,6 @@ class PinBoardController {
         String pinboardFolderName = userFolderName + "/" + pinboard_id
         String filePath = pinboardFolderName + "/" + item.name
 
-        print(filePath);
-
         def file = new File(filePath)
 
         if (file.exists()) {
@@ -148,4 +147,5 @@ class PinBoardController {
             response.outputStream.flush()
         }
     }
+
 }
