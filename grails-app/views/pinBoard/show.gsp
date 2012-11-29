@@ -22,8 +22,8 @@
             var canvas = document.getElementById("pinboard_canvas");
             var ctx = canvas.getContext("2d");
 
-            var icon_size_x = 20;
-            var icon_size_y = 20;
+            var ICON_SIZE_X = 20;
+            var ICON_SIZE_Y = 20;
             var items = [];
             var mousePressed = false;
             var selectedItem = null;
@@ -33,12 +33,38 @@
                 e.preventDefault();
             }
 
-            function item (x,y,w,h){
-                this.x = x || 0;
-                this.y = y || 0;
-                this.w = w || icon_size_x;
-                this.h = h || icon_size_y;
+            function Item (x, y, w, h) {
+                console.log("Item(): Creating new Item(x = %d, y = %d, w = %d, h = %d)",
+                            x, y, w, h);
+                this.x = x;
+                this.y = y;
+                this.w = w;
+                this.h = h;
             }
+
+            Item.prototype.draw = function() {
+                var default_img = new Image();
+                var x = this.x;
+                var y = this.y;
+                var w = this.w;
+                var h = this.h;
+                default_img.onload = function() {
+                    console.log("Drawing image at (%d, %d)", x, y);
+                    ctx.drawImage(default_img, x, y, w, h);
+                };
+                default_img.src = "${g.resource(dir: 'images', file: 'Binary-icon.png')}";
+            };
+
+            Item.prototype.undraw = function() {
+                ctx.clearRect(this.x, this.y, this.w, this.h);
+            };
+
+            Item.prototype.move = function(x, y) {
+                this.undraw();
+                this.x = x;
+                this.y = y;
+                this.draw();
+            };
 
             // Return the canvas coordinates of an event e.  *** only works
             // correctly if the canvas width and height are the same as the css
@@ -77,13 +103,14 @@
                         (items[i].x + items[i].w) > x &&
                         (items[i].y + items[i].h) > y)
                     {
-                        selectedItem = item;
+                        selectedItem = items[i];
                         console.log("canvas.onmousedown(): Selected item %d "
                                     + "near (%d, %d)", i, x, y);
                         canvas.onmousemove = function (e) {
                             var mousePos = getMousePos(canvas, e);
                             var x = mousePos.x;
                             var y = mousePos.y;
+                            selectedItem.move(x, y);
                             console.log("canvas.onmousemove(): Moved cursor "
                                         + "to (%d, %d)", x, y);
                         };
@@ -109,13 +136,10 @@
                 // pinboard, then upload the file using an AJAX call (POST)
                 if (files.length == 1) {
 
-                    var default_img = new Image();
-                    default_img.onload = function() {
-                        ctx.drawImage(default_img, x, y, icon_size_x, icon_size_y);
-                    };
-                    default_img.src = "${g.resource(dir: "images", file: "Binary-icon.png")}";
+                    var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y);
+                    items.push(item);
+                    item.draw();
 
-                    items.push(new item(x, y));
                     console.log("canvas.ondrop(): Added new item (there are now %d items)",
                                 items.length);
 
