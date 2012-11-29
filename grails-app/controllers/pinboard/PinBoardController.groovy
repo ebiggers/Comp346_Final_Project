@@ -122,4 +122,30 @@ class PinBoardController {
 
 		return render("${item.id}") //"File \"${filename}\" has been uploaded!")
 	}
+
+    def downloadFile() {
+        User u = User.get(session.user)
+        int pinboard_id = new Integer(params.Pinboard_id).intValue()
+        int item_id = new Integer(params.Item_id).intValue()
+
+        PinBoard pinboard = PinBoard.get(pinboard_id)
+        Item item = pinboard.getItemFromId(item_id)
+
+        String dir = grailsApplication.config.pinboard.upload_dir
+        String username = u.username
+        String userFolderName = dir + "/" + username
+        String pinboardFolderName = userFolderName + "/" + pinboard_id
+        String filePath = pinboardFolderName + "/" + item.name
+
+        print(filePath);
+
+        def file = new File(filePath)
+
+        if (file.exists()) {
+            response.setContentType("application/octet-stream")
+            response.setHeader("Content-disposition", "filename=${file.name}")
+            response.outputStream << file.bytes
+            response.outputStream.flush()
+        }
+    }
 }
