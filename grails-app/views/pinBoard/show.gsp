@@ -88,8 +88,6 @@
                 ctx.clearRect(this.x, this.y, this.w, this.h);
             };
 
-
-
             Item.prototype.move = function(x, y) {
                 if (x != this.x || y != this.y) {
                     this.undraw();
@@ -120,21 +118,6 @@
                 canvas.onmousemove = null;
             };
 
-            canvas.ondblclick = function(e) {
-                var i = getItemFromMousePos(e);
-                if (i != -1) {
-                    selectedItem = items[i];
-                    $.ajax({
-                        url: "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}",
-                        type: 'GET',
-                        data: { "Pinboard_id" : "${pinboard.id}" , "Item_id" : selectedItem.id},
-                        success: function(data) {
-
-                        }
-                    });
-                }
-            };
-
             canvas.onmouseup = function(e) {
                 if (selectedItem != null) {
                     $.ajax({
@@ -150,7 +133,7 @@
                         }
                     });
                 }
-            };
+            }
 
             function getItemFromMousePos(e) {
                 var mousePos = getMousePos(canvas, e);
@@ -170,21 +153,12 @@
                 return -1;
             }
 
-            function drawAllItems () {
-                var num_Items = items.length;
-                for (var i = 0; i < num_Items; i++) {
-                    var currentItem = items[i];
-                    currentItem.draw();
-                }
-            }
-
             function CanvasOnMouseMove(e) {
                 canvas.onmousemove = function (e) {
                     var mousePos = getMousePos(canvas, e);
                     var x = mousePos.x;
                     var y = mousePos.y;
                     selectedItem.move(x, y);
-                    drawAllItems();
                     console.log("canvas.onmousemove(): Moved cursor to (%d, %d)", x, y);
                 };
             }
@@ -193,6 +167,21 @@
             // correctly???
             canvas.ondragenter = StopEvent;
             canvas.ondragover = StopEvent;
+
+            canvas.ondblclick = function(e) {
+                var i = getItemFromMousePos(e);
+                if (i != -1) {
+                    selectedItem = items[i];
+                    $.ajax({
+                        url: "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}",
+                        type: 'GET',
+                        data: { "Pinboard_id" : "${pinboard.id}" , "Item_id" : selectedItem.id},
+                        success: function(data) {
+
+                        }
+                    });
+                }
+            };
 
 
 
