@@ -21,17 +21,17 @@
             // context.
             var canvas = document.getElementById("pinboard_canvas");
             var ctx = canvas.getContext("2d");
+
             var icon_size_x = 20;
             var icon_size_y = 20;
             var items = [];
+            var mousePressed = false;
+            var selectedItem = null;
 
-            // Both dragenter and dragover must be cancelled for drop to work
-            // correctly???
-
-            canvas.addEventListener("dragenter", StopEvent, false);
-            canvas.addEventListener("dragover", StopEvent, false);
-            canvas.addEventListener("drop", OnDrop, false);
-            canvas.addEventListener('mousedown', OnClick, true);
+            function StopEvent(e) {
+                e.stopPropagation();
+                e.preventDefault();
+            }
 
             function item (x,y,w,h){
                 this.x = x || 0;
@@ -40,29 +40,61 @@
                 this.h = h || icon_size_y;
             }
 
-            function OnClick(e){
-                var mousePos = getMousePos(canvas, e);
-                var mx = mousePos.x;
-                var my = mousePos.y;
-                var l = items.length;
+            // Return the canvas coordinates of an event e.  *** only works
+            // correctly if the canvas width and height are the same as the css
+            // width and height. ***
+            function getMousePos(canvas, e) {
+                var rect = canvas.getBoundingClientRect();
+                return {
+                    // window.devicePixelRatio is used to correct the Retina screen
+                    x: (e.clientX - rect.left) /(window.devicePixelRatio*window.devicePixelRatio),
+                    y: (e.clientY - rect.top) /(window.devicePixelRatio*window.devicePixelRatio)
+                };
+            }
 
-                alert('here');
-                for (var i = l-1; i >= 0; i--) {
-                    if (items[i].x < mx && items[i].y < my && (items[i].x+items[i].w) > mx && (items[i].y+items[i].h) > my ){
-                    alert("selected");
-                    return;
+            document.onmousedown = function(e) {
+                mousePressed = true;
+            };
+
+            document.onmouseup = function(e) {
+                mousePressed = false;
+                canvas.onmousemove = null;
+            };
+
+            // Both dragenter and dragover must be cancelled for drop to work
+            // correctly???
+            canvas.ondragenter = StopEvent;
+            canvas.ondragover = StopEvent;
+            canvas.onmousedown = function(e) {
+                var mousePos = getMousePos(canvas, e);
+                var x = mousePos.x;
+                var y = mousePos.y;
+                var len = items.length;
+
+                for (var i = len - 1; i >= 0; i--) {
+                    if (items[i].x < x &&
+                        items[i].y < y &&
+                        (items[i].x + items[i].w) > x &&
+                        (items[i].y + items[i].h) > y)
+                    {
+                        selectedItem = item;
+                        console.log("canvas.onmousedown(): Selected item %d "
+                                    + "near (%d, %d)", i, x, y);
+                        canvas.onmousemove = function (e) {
+                            var mousePos = getMousePos(canvas, e);
+                            var x = mousePos.x;
+                            var y = mousePos.y;
+                            console.log("canvas.onmousemove(): Moved cursor "
+                                        + "to (%d, %d)", x, y);
+                        };
+                        return;
                     }
                 }
-                alert("x: "+mx+" y:"+my + " Length:" + l);
-            }
+                console.log("canvas.onmousedown(): No item near (%d, %d)",
+                            x, y);
+            };
 
-            function StopEvent(e) {
-                e.stopPropagation();
-                e.preventDefault();
-            }
-
-            // Called when an item is dropped onto the pinboard.
-            function OnDrop(e) {
+            canvas.ondrop = function(e) {
                 StopEvent(e);
 
                 files = e.dataTransfer.files;
@@ -71,7 +103,7 @@
                 var x = mousePos.x;
                 var y = mousePos.y;
 
-                //alert("x: "+x+" y:"+y);
+                console.log("canvas.ondrop():  Drop event at (%d, %d)", x, y);
 
                 // If a file was dropped, put a default file icon on the
                 // pinboard, then upload the file using an AJAX call (POST)
@@ -83,9 +115,9 @@
                     };
                     default_img.src = "${g.resource(dir: "images", file: "Binary-icon.png")}";
 
-                    var l = items.length;
-                    items[(l+1)] = new item(x,y);
-                    alert(items.length);
+                    items.push(new item(x, y));
+                    console.log("canvas.ondrop(): Added new item (there are now %d items)",
+                                items.length);
 
                     // The FormData object simulates submitting a form using the
                     // form-data/multipart enctype (as would be used for an
@@ -106,20 +138,14 @@
                             alert(data);
                         }
                     });
+                } else {
+                    if (files.length == 0) {
+                        console.log("No files dropped!");
+                    } else {
+                        console.log("Multiple files dropped!");
+                    }
                 }
-            }
-
-            // Return the canvas coordinates of an event e.  *** only works
-            // correctly if the canvas width and height are the same as the css
-            // width and height. ***
-            function getMousePos(canvas, e) {
-                var rect = canvas.getBoundingClientRect();
-                return {
-                    // window.devicePixelRatio is used to correct the Retina screen
-                    x: (e.clientX - rect.left) /(window.devicePixelRatio*window.devicePixelRatio),
-                    y: (e.clientY - rect.top) /(window.devicePixelRatio*window.devicePixelRatio)
-                };
-            }
+            };
         });
     </r:script>
   </head>
@@ -138,9 +164,9 @@
       </div>
     </div>
     <div id="main">
-        <canvas id="pinboard_canvas" width="${pinboard.width}" height="${pinboard.height}">
-          Your browser does not support the HTML 5 canvas tag
-        </canvas>
+      <canvas id="pinboard_canvas" width="${pinboard.width}" height="${pinboard.height}">
+        Your browser does not support the HTML 5 canvas tag
+      </canvas>
     </div>
   </body>
 </html>
