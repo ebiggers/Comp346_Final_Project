@@ -45,7 +45,7 @@
                 },
                 error: function(jqXHR, textStatus, errorThrown) {
                     alert("Failed to download items from server");
-                }
+                },
             });
 
             function StopEvent(e) {
@@ -130,7 +130,7 @@
                         success: function(data) {
                         },
                         error: function(jqXHR, textStatus, errorThrown) {
-                        }
+                        },
                     });
                 }
             }
@@ -167,24 +167,6 @@
             // correctly???
             canvas.ondragenter = StopEvent;
             canvas.ondragover = StopEvent;
-
-            canvas.ondblclick = function(e) {
-                var i = getItemFromMousePos(e);
-                if (i != -1) {
-                    selectedItem = items[i];
-                    $.ajax({
-                        url: "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}",
-                        type: 'GET',
-                        data: { "Pinboard_id" : "${pinboard.id}" , "Item_id" : selectedItem.id},
-                        success: function(data) {
-
-                        }
-                    });
-                }
-            };
-
-
-
             canvas.onmousedown = function(e) {
                 var i = getItemFromMousePos(e);
                 if (i != -1) {
