@@ -15,6 +15,15 @@ class PinBoard {
 		name = "Untitled";
 	}
 
+    Item getItem(int item_id) {
+		pinboard.items.each {
+			if (it.id == item_id) {
+				return it;
+			}
+		}
+		return null;
+    }
+
 	static constraints = {
 		width(min: 1, nullable: false)
 		height(min: 1, nullable: false)

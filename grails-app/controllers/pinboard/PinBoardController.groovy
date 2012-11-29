@@ -44,6 +44,37 @@ class PinBoardController {
 		render pinboard.items as JSON
 	}
 
+	def deleteItem() {
+		User u = User.get(session.user)
+		int pinboard_id = new Integer(params.pinboard_id).intValue()
+		int item_id = new Integer(params.item_id).intValue()
+
+		PinBoard pinboard = PinBoard.get(pinboard_id)
+		Item item = pinboard.getPinboardItemFromId(item_id)
+		if (item != null) {
+			pinboard.removeFromItems(item)
+			pinboard.save(failOnError: true)
+			render("Item ${item_id} on pinboard ${pinboard_id} was successfully deleted.");
+		}
+	}
+
+	def updateItem() {
+		User u = User.get(session.user)
+		int pinboard_id = new Integer(params.pinboard_id).intValue()
+		int item_id = new Integer(params.item_id).intValue()
+		int x_pos = new Double(params.x_pos).intValue()
+		int y_pos = new Double(params.y_pos).intValue()
+
+		PinBoard pinboard = PinBoard.get(pinboard_id)
+		Item item = pinboard.getPinboardItemFromId(item_id)
+		if (item != null) {
+			item.x_pos = x_pos
+			item.y_pos = y_pos
+			item.save(failOnError: true)
+			render("Item ${item_id} on pinboard ${pinboard_id} was successfull updated.");
+		}
+	}
+
 	def uploadFile() {
 
 		int x_pos = new Double(params.x_pos).intValue()  //casting to the right type here
