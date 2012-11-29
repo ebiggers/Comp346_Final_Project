@@ -47,8 +47,8 @@
                 var rect = canvas.getBoundingClientRect();
                 return {
                     // window.devicePixelRatio is used to correct the Retina screen
-                    x: (e.clientX - rect.left) /(window.devicePixelRatio*window.devicePixelRatio),
-                    y: (e.clientY - rect.top) /(window.devicePixelRatio*window.devicePixelRatio)
+                    x: (e.clientX - rect.left) / (window.devicePixelRatio),
+                    y: (e.clientY - rect.top) / (window.devicePixelRatio)
                 };
             }
 
