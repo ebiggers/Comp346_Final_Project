@@ -15,8 +15,17 @@ class PinBoard {
 		name = "Untitled";
 	}
 
-    Item getItem(int item_id) {
-		pinboard.items.each {
+    Item getItemFromFilename(String filename) {
+		items.each {
+			if (it.name == filename) {
+				return it;
+			}
+		}
+		return null;
+    }
+
+    Item getItemFromId(int item_id) {
+		items.each {
 			if (it.id == item_id) {
 				return it;
 			}

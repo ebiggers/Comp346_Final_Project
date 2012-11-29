@@ -53,15 +53,15 @@
                 e.preventDefault();
             }
 
-            function Item(x, y, w, h, filename) {
+            function Item(x, y, w, h, id) {
                 console.log("Item(): Creating new Item(x = %d, y = %d, " +
-                            "w = %d, h = %d, filename = %s)",
-                            x, y, w, h, filename);
+                            "w = %d, h = %d, id = %d)",
+                            x, y, w, h, id);
                 this.x = x;
                 this.y = y;
                 this.w = w;
                 this.h = h;
-                this.filename = filename;
+                this.id = id;
             }
 
             var default_img = new Image();
@@ -117,6 +117,23 @@
                 mousePressed = false;
                 canvas.onmousemove = null;
             };
+
+            canvas.onmouseup = function(e) {
+                if (selectedItem != null) {
+                    $.ajax({
+                        url: "${g.createLink(controller: 'PinBoard', action: 'updateItem')}",
+                        type: 'POST',
+                        data: { "pinboard_id" : "${pinboard.id}",
+                                "item_id" : selectedItem.id,
+                                "x_pos" : selectedItem.x,
+                                "y_pos" : selectedItem.y },
+                        success: function(data) {
+                        },
+                        error: function(jqXHR, textStatus, errorThrown) {
+                        },
+                    });
+                }
+            }
 
             function getItemFromMousePos(e) {
                 var mousePos = getMousePos(canvas, e);
@@ -178,12 +195,9 @@
                 if (files.length == 1) {
 
                     var file = files[0];
-                    var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y, file.name);
-                    items.push(item);
-                    item.draw();
 
-                    console.log("canvas.ondrop(): Added new item (there are now %d items)",
-                                items.length);
+                    console.log("canvas.ondrop(): Starting upload of file %s",
+                                file.name);
 
                     // The FormData object simulates submitting a form using the
                     // form-data/multipart enctype (as would be used for an
@@ -201,9 +215,18 @@
                         processData: false, // Must be false when using FormData
                         type: 'POST',
                         success: function(data) {
-                            alert(data);
+                            var id = data;
+                            console.log("Assigning new id = %d", id);
+                            var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y, id);
+                            console.log("Finished uploading item (id=%d)", id);
+                            items.push(item);
+                            item.draw();
                         }
                     });
+
+                    console.log("canvas.ondrop(): Added new item (there are now %d items)",
+                                items.length);
+
                 } else {
                     if (files.length == 0) {
                         console.log("No files dropped!");

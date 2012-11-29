@@ -46,11 +46,11 @@ class PinBoardController {
 
 	def deleteItem() {
 		User u = User.get(session.user)
-		int pinboard_id = new Integer(params.id).intValue()
+		int pinboard_id = new Integer(params.pinboard_id).intValue()
 		int item_id = new Integer(params.item_id).intValue()
 
 		PinBoard pinboard = getCurrentPinBoard(u)
-		Item item = pinboard.getPinboardItemFromId(item_id)
+		Item item = pinboard.getItemFromId(item_id)
 		if (item != null) {
 			pinboard.removeFromItems(item)
 			pinboard.save(failOnError: true)
@@ -66,12 +66,14 @@ class PinBoardController {
 		int y_pos = new Double(params.y_pos).intValue()
 
 		PinBoard pinboard = PinBoard.get(pinboard_id)
-		Item item = pinboard.getPinboardItemFromId(item_id)
+		Item item = pinboard.getItemFromId(item_id)
 		if (item != null) {
 			item.x_pos = x_pos
 			item.y_pos = y_pos
 			item.save(failOnError: true)
-			render("Item ${item_id} on pinboard ${pinboard_id} was successfull updated.");
+			render("Item ${item_id} on pinboard ${pinboard_id} was successfully updated.");
+		} else {
+			render("No item found")
 		}
 	}
 
@@ -111,9 +113,11 @@ class PinBoardController {
 		Item item = new Item(filename, "Generic File", x_pos, y_pos)
 
 		pinboard.addToItems(item)
+		pinboard.save(failOnError: true, flush: true)
 
-		pinboard.save(failOnError: true)
+		//pinboard = PinBoard.get(pinboard_id)
+		//item = pinboard.getItemFromFilename(filename)
 
-		return render("File \"${filename}\" has been uploaded!")
+		return render("${item.id}") //"File \"${filename}\" has been uploaded!")
 	}
 }
