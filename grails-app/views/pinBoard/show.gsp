@@ -28,18 +28,40 @@
             var mousePressed = false;
             var selectedItem = null;
 
+
+            $.ajax({
+                url: "${g.createLink(controller: 'PinBoard', action: 'listItems')}",
+                type: 'GET',
+                data: { "id" : "${pinboard.id}" },
+                success: function(data) {
+                    var num_items = data.length;
+                    for (var i = 0; i < num_items; i++) {
+                        var item = new Item(data[i].x_pos, data[i].y_pos,
+                                            ICON_SIZE_X, ICON_SIZE_Y,
+                                            data[i].name);
+                        item.draw();
+                        items.push(item);
+                    }
+                },
+                error: function(jqXHR, textStatus, errorThrown) {
+                    alert("Failed to download items from server");
+                },
+            });
+
             function StopEvent(e) {
                 e.stopPropagation();
                 e.preventDefault();
             }
 
-            function Item (x, y, w, h) {
-                console.log("Item(): Creating new Item(x = %d, y = %d, w = %d, h = %d)",
-                            x, y, w, h);
+            function Item(x, y, w, h, filename) {
+                console.log("Item(): Creating new Item(x = %d, y = %d, " +
+                            "w = %d, h = %d, filename = %s)",
+                            x, y, w, h, filename);
                 this.x = x;
                 this.y = y;
                 this.w = w;
                 this.h = h;
+                this.filename = filename;
             }
 
             var default_img = new Image();
@@ -96,11 +118,7 @@
                 canvas.onmousemove = null;
             };
 
-            // Both dragenter and dragover must be cancelled for drop to work
-            // correctly???
-            canvas.ondragenter = StopEvent;
-            canvas.ondragover = StopEvent;
-            canvas.onmousedown = function(e) {
+            function getItemFromMousePos(e) {
                 var mousePos = getMousePos(canvas, e);
                 var x = mousePos.x;
                 var y = mousePos.y;
@@ -112,22 +130,32 @@
                         (items[i].x + items[i].w) > x &&
                         (items[i].y + items[i].h) > y)
                     {
-                        selectedItem = items[i];
-                        console.log("canvas.onmousedown(): Selected item %d "
-                                    + "near (%d, %d)", i, x, y);
-                        canvas.onmousemove = function (e) {
-                            var mousePos = getMousePos(canvas, e);
-                            var x = mousePos.x;
-                            var y = mousePos.y;
-                            selectedItem.move(x, y);
-                            console.log("canvas.onmousemove(): Moved cursor "
-                                        + "to (%d, %d)", x, y);
-                        };
-                        return;
+                        return i;
                     }
                 }
-                console.log("canvas.onmousedown(): No item near (%d, %d)",
-                            x, y);
+                return -1;
+            }
+
+            function CanvasOnMouseMove(e) {
+                canvas.onmousemove = function (e) {
+                    var mousePos = getMousePos(canvas, e);
+                    var x = mousePos.x;
+                    var y = mousePos.y;
+                    selectedItem.move(x, y);
+                    console.log("canvas.onmousemove(): Moved cursor to (%d, %d)", x, y);
+                };
+            }
+
+            // Both dragenter and dragover must be cancelled for drop to work
+            // correctly???
+            canvas.ondragenter = StopEvent;
+            canvas.ondragover = StopEvent;
+            canvas.onmousedown = function(e) {
+                var i = getItemFromMousePos(e);
+                if (i != -1) {
+                    selectedItem = items[i];
+                    canvas.onmousemove = CanvasOnMouseMove;
+                }
             };
 
             //canvas.ondblclick = function(e) {
@@ -149,7 +177,8 @@
                 // pinboard, then upload the file using an AJAX call (POST)
                 if (files.length == 1) {
 
-                    var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y);
+                    var file = files[0];
+                    var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y, file.name);
                     items.push(item);
                     item.draw();
 
@@ -160,7 +189,7 @@
                     // form-data/multipart enctype (as would be used for an
                     // <input> of type "file")
                     var data = new FormData();
-                    data.append("file", files[0]);
+                    data.append("file", file);
                     data.append("x_pos", x);
                     data.append("y_pos", y);
                     data.append("pinboard_id", ${pinboard.id});

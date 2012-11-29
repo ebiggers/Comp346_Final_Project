@@ -46,10 +46,10 @@ class PinBoardController {
 
 	def deleteItem() {
 		User u = User.get(session.user)
-		int pinboard_id = new Integer(params.pinboard_id).intValue()
+		int pinboard_id = new Integer(params.id).intValue()
 		int item_id = new Integer(params.item_id).intValue()
 
-		PinBoard pinboard = PinBoard.get(pinboard_id)
+		PinBoard pinboard = getCurrentPinBoard(u)
 		Item item = pinboard.getPinboardItemFromId(item_id)
 		if (item != null) {
 			pinboard.removeFromItems(item)
