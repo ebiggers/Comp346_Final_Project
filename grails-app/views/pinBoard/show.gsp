@@ -42,17 +42,24 @@
                 this.h = h;
             }
 
+            var default_img = new Image();
+            default_img.src = "${g.resource(dir: 'images', file: 'Binary-icon.png')}";
+            var outstanding_draw_requests = [];
+
+            function DefaultImgOnLoadHandler() {
+                var num_images = outstanding_draw_requests.length;
+                for (var i = 0; i < num_images; i++) {
+                    outstanding_draw_requests[i].draw();
+                }
+            }
+
             Item.prototype.draw = function() {
-                var default_img = new Image();
-                var x = this.x;
-                var y = this.y;
-                var w = this.w;
-                var h = this.h;
-                default_img.onload = function() {
-                    console.log("Drawing image at (%d, %d)", x, y);
-                    ctx.drawImage(default_img, x, y, w, h);
-                };
-                default_img.src = "${g.resource(dir: 'images', file: 'Binary-icon.png')}";
+                if (default_img.complete) {
+                    ctx.drawImage(default_img, this.x, this.y, this.w, this.h);
+                } else {
+                    default_img.onload = DefaultImgOnLoadHandler;
+                    outstanding_draw_requests.push(this);
+                }
             };
 
             Item.prototype.undraw = function() {
@@ -60,10 +67,12 @@
             };
 
             Item.prototype.move = function(x, y) {
-                this.undraw();
-                this.x = x;
-                this.y = y;
-                this.draw();
+                if (x != this.x || y != this.y) {
+                    this.undraw();
+                    this.x = Math.round(x);
+                    this.y = Math.round(y);
+                    this.draw();
+                }
             };
 
             // Return the canvas coordinates of an event e.  *** only works
@@ -120,6 +129,10 @@
                 console.log("canvas.onmousedown(): No item near (%d, %d)",
                             x, y);
             };
+
+            //canvas.ondblclick = function(e) {
+                //console.log("canvas.ondblclick
+            //}
 
             canvas.ondrop = function(e) {
                 StopEvent(e);
