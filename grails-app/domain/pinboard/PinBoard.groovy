@@ -15,22 +15,20 @@ class PinBoard {
 		name = "Untitled";
 	}
 
-    Item getItemFromFilename(String filename) {
-		items.each {
-			if (it.name == filename) {
-				return it;
-			}
-		}
-		return null;
-    }
+    //Item getItemFromFilename(String filename) {
+        //for (Item item in items)
+            //if (item.name == filename)
+                //return item
+        //return null
+    //}
 
     Item getItemFromId(int item_id) {
-		items.each {
-			if (it.id == item_id) {
-				return it;
-			}
-		}
-		return null;
+        for (Item item in items) {
+            if (item.id == item_id) {
+                return item
+            }
+        }
+        return null
     }
 
 	static constraints = {

@@ -73,7 +73,9 @@ class PinBoardController {
 			item.save(failOnError: true)
 			render("Item ${item_id} on pinboard ${pinboard_id} was successfully updated.");
 		} else {
-			render("No item found")
+			render("No item found (params = {.pinboard_id = ${params.pinboard_id}" +
+					", .item_id = ${params.item_id}, .x_pos = ${params.x_pos}, " +
+					".y_pos = ${params.y_pos}})");
 		}
 	}
 

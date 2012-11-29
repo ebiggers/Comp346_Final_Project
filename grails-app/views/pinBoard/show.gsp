@@ -38,7 +38,7 @@
                     for (var i = 0; i < num_items; i++) {
                         var item = new Item(data[i].x_pos, data[i].y_pos,
                                             ICON_SIZE_X, ICON_SIZE_Y,
-                                            data[i].name);
+                                            data[i].id);
                         item.draw();
                         items.push(item);
                     }
