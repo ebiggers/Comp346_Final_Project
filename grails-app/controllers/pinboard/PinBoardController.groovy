@@ -19,23 +19,29 @@ class PinBoardController {
 		}
 	}
 
+	private PinBoard getCurrentPinBoard(User u) {
+		PinBoard pinboard
+		try {
+			pinboard = PinBoard.get(params.id)
+			if (pinboard.user.id != session.user) {
+				pinboard = getDefaultPinBoard()
+			}
+		} catch (Exception e) {
+			pinboard = getDefaultPinBoard(u)
+		}
+		return pinboard
+	}
+
     def show() {
 		User u = User.get(session.user)
-		PinBoard pinboard = getDefaultPinBoard(u)
-		//try {
-			//pinboard = PinBoard.get(params.id)
-			//if (pinboard.user.id != session.user.id) {
-				//pinboard = getDefaultPinBoard()
-			//}
-		//} catch (Exception e) {
-			//e.printStackTrace()
-			//pinboard = getDefaultPinBoard(session.user)
-		//}
+		PinBoard pinboard = getCurrentPinBoard(u)
 		[pinboard: pinboard, user: u]
     }
 
 	def listItems() {
-		render items as JSON
+		User u = User.get(session.user)
+		PinBoard pinboard = getCurrentPinBoard(u)
+		render pinboard.items as JSON
 	}
 
 	def uploadFile() {
@@ -43,7 +49,6 @@ class PinBoardController {
 		int x_pos = new Double(params.x_pos).intValue()  //casting to the right type here
 		int y_pos = new Double(params.y_pos).intValue()
 		int pinboard_id = new Integer(params.pinboard_id).intValue()
-
 
 		User u = User.get(session.user)
 
