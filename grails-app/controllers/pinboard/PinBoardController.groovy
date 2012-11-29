@@ -20,21 +20,24 @@ class PinBoardController {
 	}
 
 	private PinBoard getCurrentPinBoard(User u) {
+		PinBoard pinboard = PinBoard.get(params.pinboard_id)
+		if (pinboard == null || pinboard.user.id != session.user)
+			return null
+		else
+			return pinboard
+	}
+
+	private PinBoard getCurrentOrDefaultPinBoard(User u) {
 		PinBoard pinboard
-		try {
-			pinboard = PinBoard.get(params.id)
-			if (pinboard.user.id != session.user) {
-				pinboard = getDefaultPinBoard()
-			}
-		} catch (Exception e) {
+		pinboard = getCurrentPinBoard(u)
+		if (pinboard == null)
 			pinboard = getDefaultPinBoard(u)
-		}
 		return pinboard
 	}
 
     def show() {
 		User u = User.get(session.user)
-		PinBoard pinboard = getCurrentPinBoard(u)
+		PinBoard pinboard = getCurrentOrDefaultPinBoard(u)
 		[pinboard: pinboard, user: u]
     }
 
@@ -46,10 +49,9 @@ class PinBoardController {
 
 	def deleteItem() {
 		User u = User.get(session.user)
-		int pinboard_id = new Integer(params.pinboard_id).intValue()
 		int item_id = new Integer(params.item_id).intValue()
-
 		PinBoard pinboard = getCurrentPinBoard(u)
+
 		Item item = pinboard.getItemFromId(item_id)
 		if (item != null) {
 			pinboard.removeFromItems(item)
@@ -60,18 +62,16 @@ class PinBoardController {
 
 	def updateItem() {
 		User u = User.get(session.user)
-		int pinboard_id = new Integer(params.pinboard_id).intValue()
 		int item_id = new Integer(params.item_id).intValue()
 		int x_pos = new Double(params.x_pos).intValue()
 		int y_pos = new Double(params.y_pos).intValue()
-
-		PinBoard pinboard = PinBoard.get(pinboard_id)
+		PinBoard pinboard = getCurrentPinBoard(u)
 		Item item = pinboard.getItemFromId(item_id)
 		if (item != null) {
 			item.x_pos = x_pos
 			item.y_pos = y_pos
 			item.save(failOnError: true)
-			render("Item ${item_id} on pinboard ${pinboard_id} was successfully updated.");
+			render("Item ${item_id} on pinboard ${pinboard.id} was successfully updated.");
 		} else {
 			render("No item found (params = {.pinboard_id = ${params.pinboard_id}" +
 					", .item_id = ${params.item_id}, .x_pos = ${params.x_pos}, " +
@@ -83,11 +83,8 @@ class PinBoardController {
 
 		int x_pos = new Double(params.x_pos).intValue()  //casting to the right type here
 		int y_pos = new Double(params.y_pos).intValue()
-		int pinboard_id = new Integer(params.pinboard_id).intValue()
-
 		User u = User.get(session.user)
-
-		PinBoard pinboard = PinBoard.get(pinboard_id)
+		PinBoard pinboard = getCurrentPinBoard(u)
 
 		def f = request.getFile("file")
 
@@ -104,7 +101,7 @@ class PinBoardController {
 			userFolder.mkdir()
 		}
 
-		String pinboardFolderName = userFolderName + "/" + pinboard_id
+		String pinboardFolderName = userFolderName + "/" + pinboard.id
 		File pinboardFolder = new File(pinboardFolderName)
 		if (!pinboardFolder.exists()) {
 			pinboardFolder.mkdir()
@@ -117,27 +114,20 @@ class PinBoardController {
 		pinboard.addToItems(item)
 		pinboard.save(failOnError: true, flush: true)
 
-		//pinboard = PinBoard.get(pinboard_id)
-		//item = pinboard.getItemFromFilename(filename)
-
 		return render("${item.id}") //"File \"${filename}\" has been uploaded!")
 	}
 
     def downloadFile() {
         User u = User.get(session.user)
-        int pinboard_id = new Integer(params.Pinboard_id).intValue()
         int item_id = new Integer(params.Item_id).intValue()
-
-        PinBoard pinboard = PinBoard.get(pinboard_id)
+        PinBoard pinboard = getCurrentPinBoard(u)
         Item item = pinboard.getItemFromId(item_id)
 
         String dir = grailsApplication.config.pinboard.upload_dir
         String username = u.username
         String userFolderName = dir + "/" + username
-        String pinboardFolderName = userFolderName + "/" + pinboard_id
+        String pinboardFolderName = userFolderName + "/" + pinboard.id
         String filePath = pinboardFolderName + "/" + item.name
-
-        print(filePath);
 
         def file = new File(filePath)
 

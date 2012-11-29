@@ -32,7 +32,7 @@
             $.ajax({
                 url: "${g.createLink(controller: 'PinBoard', action: 'listItems')}",
                 type: 'GET',
-                data: { "id" : "${pinboard.id}" },
+                data: { "pinboard_id" : "${pinboard.id}" },
                 success: function(data) {
                     var num_items = data.length;
                     for (var i = 0; i < num_items; i++) {
@@ -123,13 +123,13 @@
             canvas.ondblclick = function(e) {
                 var i = getItemFromMousePos(e);
                 if (i != -1) {
-                    selectedItem = items[i];
+                    var item = items[i];
                     $.ajax({
                         url: "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}",
                         type: 'GET',
-                        data: { "Pinboard_id" : "${pinboard.id}" , "Item_id" : selectedItem.id},
+                        data: { "pinboard_id" : "${pinboard.id}" ,
+                                "item_id" : item.id },
                         success: function(data) {
-
                         }
                     });
                 }
