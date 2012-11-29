@@ -104,10 +104,16 @@
             // width and height. ***
             function getMousePos(canvas, e) {
                 var rect = canvas.getBoundingClientRect();
-                return {
+                var x = e.clientX - rect.left;
+                var y = e.clientY - rect.top;
+                if (typeof window.devicePixelRatio != "undefined") {
                     // window.devicePixelRatio is used to correct the Retina screen
-                    x: (e.clientX - rect.left) / (window.devicePixelRatio),
-                    y: (e.clientY - rect.top) / (window.devicePixelRatio)
+                    x /= window.devicePixelRatio;
+                    y /= window.devicePixelRatio;
+                }
+                return {
+                    x : x,
+                    y : y,
                 };
             }
 
