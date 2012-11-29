@@ -125,14 +125,17 @@
                 if (i != -1) {
                     var item = items[i];
                     console.log("Downloading item (id = %d)", item.id);
-                    $.ajax({
-                        url: "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}",
-                        type: 'GET',
-                        data: { "pinboard_id" : "${pinboard.id}" ,
-                                "item_id" : item.id },
-                        success: function(data) {
-                        }
-                    });
+                    window.location = "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}"
+                                + "?pinboard_id=${pinboard.id}&item_id=" + item.id;
+
+                    //$.ajax({
+                        //url: "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}",
+                        //type: 'GET',
+                        //data: { "pinboard_id" : "${pinboard.id}" ,
+                                //"item_id" : item.id },
+                        //success: function(data) {
+                        //}
+                    //});
                 }
             };
 
