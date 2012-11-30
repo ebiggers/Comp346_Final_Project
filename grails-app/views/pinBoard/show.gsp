@@ -28,6 +28,20 @@
             var mousePressed = false;
             var selectedItem = null;
 
+            //This deals with the Retina screen for canvas
+            if (window.devicePixelRatio) {
+                var hidefCanvasWidth = $(canvas).attr('width');
+                var hidefCanvasHeight = $(canvas).attr('height');
+                var hidefCanvasCssWidth = hidefCanvasWidth;
+                var hidefCanvasCssHeight = hidefCanvasHeight;
+
+                $(canvas).attr('width', hidefCanvasWidth * window.devicePixelRatio);
+                $(canvas).attr('height', hidefCanvasHeight * window.devicePixelRatio);
+                $(canvas).css('width', hidefCanvasCssWidth);
+                $(canvas).css('height', hidefCanvasCssHeight);
+                ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            }
+
 
             $.ajax({
                 url: "${g.createLink(controller: 'PinBoard', action: 'listItems')}",
@@ -106,14 +120,14 @@
                 var rect = canvas.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 var y = e.clientY - rect.top;
-                if (typeof window.devicePixelRatio != "undefined") {
-                    // window.devicePixelRatio is used to correct the Retina screen
-                    x /= window.devicePixelRatio;
-                    y /= window.devicePixelRatio;
-                }
+//                if (typeof window.devicePixelRatio != "undefined") {
+//                    // window.devicePixelRatio is used to correct the Retina screen
+//                    x /= window.devicePixelRatio;
+//                    y /= window.devicePixelRatio;
+//                }
                 return {
                     x : x,
-                    y : y,
+                    y : y
                 };
             }
 
@@ -288,7 +302,7 @@
         </span>
       </div>
       <div id="messages">
-        Simply drag files onto your pinboard to upload them!
+        <p>Simply drag files onto your pinboard to upload them!</p>
       </div>
     </div>
     <div id="main">
