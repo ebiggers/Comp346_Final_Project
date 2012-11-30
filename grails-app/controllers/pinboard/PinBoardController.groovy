@@ -128,9 +128,9 @@ class PinBoardController {
         PinBoard pinboard = getCurrentPinBoard(u)
         Item item = pinboard.getItemFromId(item_id)
 
-        String filePath = grailsApplication.config.pinboard.upload_dir
-                          + "/" + u.username + "/" + pinboard.id + "/"
-                          + item.dataPath;
+        String filePath = grailsApplication.config.pinboard.upload_dir +
+                          "/" + u.username + "/" + pinboard.id +
+                          "/" + item.dataPath;
 
         def file = new File(filePath)
 

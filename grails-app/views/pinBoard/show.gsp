@@ -220,6 +220,22 @@
                 }
             };
 
+            document.onkeypress = function(e) {
+                console.log("Keypress keycode=%d", e.keyCode);
+                if (selectedItem != null && e.keyCode == 49) {
+                    console.log("Deleting item: id = %d", selectedItem.id);
+                    $.ajax({
+                        url: "${g.createLink(controller: 'PinBoard', action: 'deleteItem')}",
+                        method: "POST",
+                        data: {pinboard_id : ${pinboard.id},
+                               item_id: selectedItem.id},
+                        success: function(data) {
+                            alert("Deleted file id=" + selectedItem.id);
+                        }
+                    });
+                }
+            }
+
             //canvas.ondblclick = function(e) {
                 //console.log("canvas.ondblclick
             //}
