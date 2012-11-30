@@ -27,7 +27,8 @@
             var items = [];
             var mousePressed = false;
             var selectedItem = null;
-
+            var selected_x_offset;
+            var selected_y_offset;
 
             $.ajax({
                 url: "${g.createLink(controller: 'PinBoard', action: 'listItems')}",
@@ -174,6 +175,8 @@
                         (items[i].x + items[i].w) > x &&
                         (items[i].y + items[i].h) > y)
                     {
+                        selected_x_offset = x - items[i].x;
+                        selected_y_offset = y - items[i].y;
                         return i;
                     }
                 }
@@ -181,10 +184,13 @@
             }
 
             function drawAllItems () {
-                var num_Items = items.length;
-                for (var i = 0; i < num_Items; i++) {
-                    var currentItem = items[i];
-                    currentItem.draw();
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i] != selectedItem) {
+                        items[i].draw();
+                    }
+                }
+                if (selectedItem != null) {
+                    selectedItem.draw();
                 }
             }
 
@@ -193,7 +199,7 @@
                     var mousePos = getMousePos(canvas, e);
                     var x = mousePos.x;
                     var y = mousePos.y;
-                    selectedItem.move(x, y);
+                    selectedItem.move(x - selected_x_offset, y - selected_y_offset);
                     drawAllItems();
                     console.log("canvas.onmousemove(): Moved cursor to (%d, %d)", x, y);
                 };
