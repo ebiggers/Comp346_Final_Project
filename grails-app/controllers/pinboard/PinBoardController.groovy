@@ -91,7 +91,7 @@ class PinBoardController {
 		String dir = grailsApplication.config.pinboard.upload_dir
 		String username = u.username
 		if (f.getSize() > 10000000) {
-			return render("You cannot upload a file greater than 5MB")
+			return render("You cannot upload a file greater than 10 MB!")
 		}
 		String filename = f.getOriginalFilename()
 

@@ -260,12 +260,16 @@
                         processData: false, // Must be false when using FormData
                         type: 'POST',
                         success: function(data) {
-                            var id = data;
-                            console.log("Assigning new id = %d", id);
-                            var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y, id);
-                            console.log("Finished uploading item (id=%d)", id);
-                            items.push(item);
-                            item.draw();
+                            var id = parseInt(data);
+                            if (id == NaN) {
+                                console.log("Assigning new id = %d", id);
+                                var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y, id);
+                                console.log("Finished uploading item (id=%d)", id);
+                                items.push(item);
+                                item.draw();
+                            } else {
+                                alert(data);
+                            }
                         }
                     });
 
