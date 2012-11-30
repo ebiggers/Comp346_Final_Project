@@ -261,7 +261,7 @@
                         type: 'POST',
                         success: function(data) {
                             var id = parseInt(data);
-                            if (id == NaN) {
+                            if (id != NaN) {
                                 console.log("Assigning new id = %d", id);
                                 var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y, id);
                                 console.log("Finished uploading item (id=%d)", id);
