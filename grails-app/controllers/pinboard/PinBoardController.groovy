@@ -52,8 +52,13 @@ class PinBoardController {
 		int item_id = new Integer(params.item_id).intValue()
 		PinBoard pinboard = getCurrentPinBoard(u)
 
+        String filePath = grailsApplication.config.pinboard.upload_dir
+                          + "/" + u.username + "/" + pinboard.id + "/"
+                          + item.dataPath;
+
 		Item item = pinboard.getItemFromId(item_id)
 		if (item != null) {
+            new File(filePath).delete();
 			pinboard.removeFromItems(item)
 			pinboard.save(failOnError: true)
 			render("Item ${item_id} on pinboard ${pinboard_id} was successfully deleted.");
@@ -123,11 +128,9 @@ class PinBoardController {
         PinBoard pinboard = getCurrentPinBoard(u)
         Item item = pinboard.getItemFromId(item_id)
 
-        String dir = grailsApplication.config.pinboard.upload_dir
-        String username = u.username
-        String userFolderName = dir + "/" + username
-        String pinboardFolderName = userFolderName + "/" + pinboard.id
-        String filePath = pinboardFolderName + "/" + item.name
+        String filePath = grailsApplication.config.pinboard.upload_dir
+                          + "/" + u.username + "/" + pinboard.id + "/"
+                          + item.dataPath;
 
         def file = new File(filePath)
 
