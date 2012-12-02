@@ -27,12 +27,13 @@
             var items = [];
             var mousePressed = false;
             var selectedItem = null;
-
+            var selected_x_offset;
+            var selected_y_offset;
 
             $.ajax({
                 url: "${g.createLink(controller: 'PinBoard', action: 'listItems')}",
                 type: 'GET',
-                data: { "id" : "${pinboard.id}" },
+                data: { "pinboard_id" : "${pinboard.id}" },
                 success: function(data) {
                     var num_items = data.length;
                     for (var i = 0; i < num_items; i++) {
@@ -104,10 +105,16 @@
             // width and height. ***
             function getMousePos(canvas, e) {
                 var rect = canvas.getBoundingClientRect();
-                return {
+                var x = e.clientX - rect.left;
+                var y = e.clientY - rect.top;
+                if (typeof window.devicePixelRatio != "undefined") {
                     // window.devicePixelRatio is used to correct the Retina screen
-                    x: (e.clientX - rect.left) / (window.devicePixelRatio),
-                    y: (e.clientY - rect.top) / (window.devicePixelRatio)
+                    x /= window.devicePixelRatio;
+                    y /= window.devicePixelRatio;
+                }
+                return {
+                    x : x,
+                    y : y,
                 };
             }
 
@@ -123,13 +130,19 @@
             canvas.ondblclick = function(e) {
                 var i = getItemFromMousePos(e);
                 if (i != -1) {
-                    selectedItem = items[i];
-                    var pinboard_id = "${pinboard.id}"
-                    var item_id = selectedItem.id
-                    var controller = "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}";
-                    var link = controller + "?" + "Item_id=" + item_id + "&" + "Pinboard_id=" + pinboard_id
-                    window.open(link)
+                    var item = items[i];
+                    console.log("Downloading item (id = %d)", item.id);
+                    window.location = "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}"
+                                + "?pinboard_id=${pinboard.id}&item_id=" + item.id;
 
+                    //$.ajax({
+                        //url: "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}",
+                        //type: 'GET',
+                        //data: { "pinboard_id" : "${pinboard.id}" ,
+                                //"item_id" : item.id },
+                        //success: function(data) {
+                        //}
+                    //});
                 }
             };
 
@@ -162,6 +175,8 @@
                         (items[i].x + items[i].w) > x &&
                         (items[i].y + items[i].h) > y)
                     {
+                        selected_x_offset = x - items[i].x;
+                        selected_y_offset = y - items[i].y;
                         return i;
                     }
                 }
@@ -169,10 +184,13 @@
             }
 
             function drawAllItems () {
-                var num_Items = items.length;
-                for (var i = 0; i < num_Items; i++) {
-                    var currentItem = items[i];
-                    currentItem.draw();
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i] != selectedItem) {
+                        items[i].draw();
+                    }
+                }
+                if (selectedItem != null) {
+                    selectedItem.draw();
                 }
             }
 
@@ -181,7 +199,7 @@
                     var mousePos = getMousePos(canvas, e);
                     var x = mousePos.x;
                     var y = mousePos.y;
-                    selectedItem.move(x, y);
+                    selectedItem.move(x - selected_x_offset, y - selected_y_offset);
                     drawAllItems();
                     console.log("canvas.onmousemove(): Moved cursor to (%d, %d)", x, y);
                 };
@@ -201,6 +219,22 @@
                     canvas.onmousemove = CanvasOnMouseMove;
                 }
             };
+
+            document.onkeypress = function(e) {
+                console.log("Keypress keycode=%d", e.keyCode);
+                if (selectedItem != null && e.keyCode == 49) {
+                    console.log("Deleting item: id = %d", selectedItem.id);
+                    $.ajax({
+                        url: "${g.createLink(controller: 'PinBoard', action: 'deleteItem')}",
+                        method: "POST",
+                        data: {pinboard_id : ${pinboard.id},
+                               item_id: selectedItem.id},
+                        success: function(data) {
+                            alert("Deleted file id=" + selectedItem.id);
+                        }
+                    });
+                }
+            }
 
             //canvas.ondblclick = function(e) {
                 //console.log("canvas.ondblclick
@@ -242,12 +276,16 @@
                         processData: false, // Must be false when using FormData
                         type: 'POST',
                         success: function(data) {
-                            var id = data;
-                            console.log("Assigning new id = %d", id);
-                            var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y, id);
-                            console.log("Finished uploading item (id=%d)", id);
-                            items.push(item);
-                            item.draw();
+                            var id = parseInt(data);
+                            if (id != NaN) {
+                                console.log("Assigning new id = %d", id);
+                                var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y, id);
+                                console.log("Finished uploading item (id=%d)", id);
+                                items.push(item);
+                                item.draw();
+                            } else {
+                                alert(data);
+                            }
                         }
                     });
 
