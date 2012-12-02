@@ -220,10 +220,11 @@
                 }
             };
 
-            document.onkeypress = function(e) {
+            document.onkeydown = function(e) {
                 console.log("Keypress keycode=%d", e.keyCode);
-                if (selectedItem != null && e.keyCode == 49) {
+                if (selectedItem != null && e.keyCode == 46) {
                     console.log("Deleting item: id = %d", selectedItem.id);
+                    selectedItem.undraw();
                     $.ajax({
                         url: "${g.createLink(controller: 'PinBoard', action: 'deleteItem')}",
                         method: "POST",
@@ -231,6 +232,7 @@
                                item_id: selectedItem.id},
                         success: function(data) {
                             alert("Deleted file id=" + selectedItem.id);
+                            window.location.reload();
                         }
                     });
                 }
