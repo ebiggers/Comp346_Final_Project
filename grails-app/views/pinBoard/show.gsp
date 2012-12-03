@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE html>
   <head>
-    <title>Pinboard - ${user.username}</title>
+    <title>Drag and Drop Test</title>
     <meta name="layout" content="main">
     <link rel="stylesheet" href="${resource(dir: 'css', file: 'show.css')}" type="text/css">
     <style>
@@ -10,6 +10,7 @@
          * to the "width" and "height" attributes of the canvas. */
           width: ${pinboard.width}px;
           height: ${pinboard.height}px;
+          border: 1px black solid;
       }
     </style>
     <r:require module="jquery"/>
@@ -26,6 +27,8 @@
             var items = [];
             var mousePressed = false;
             var selectedItem = null;
+            var selected_x_offset;
+            var selected_y_offset;
 
             //This deals with the Retina screen for canvas
             if (window.devicePixelRatio) {
@@ -75,6 +78,7 @@
                 this.w = w;
                 this.h = h;
                 this.id = id;
+                this.sel = false;
             }
 
             var default_img = new Image();
@@ -95,6 +99,13 @@
                     default_img.onload = DefaultImgOnLoadHandler;
                     outstanding_draw_requests.push(this);
                 }
+
+                if (this.sel == true){
+                    ctx.strokeStyle = '#CC0000';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect((this.x+1), (this.y+1), (this.w-2), (this.h-2));
+                }
+
             };
 
             Item.prototype.undraw = function() {
@@ -119,14 +130,14 @@
                 var rect = canvas.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 var y = e.clientY - rect.top;
-//                if (typeof window.devicePixelRatio != "undefined") {
-//                    // window.devicePixelRatio is used to correct the Retina screen
-//                    x /= window.devicePixelRatio;
-//                    y /= window.devicePixelRatio;
-//                }
+                if (typeof window.devicePixelRatio != "undefined") {
+                    // window.devicePixelRatio is used to correct the Retina screen
+                    x /= window.devicePixelRatio;
+                    y /= window.devicePixelRatio;
+                }
                 return {
                     x : x,
-                    y : y
+                    y : y,
                 };
             }
 
@@ -187,6 +198,8 @@
                         (items[i].x + items[i].w) > x &&
                         (items[i].y + items[i].h) > y)
                     {
+                        selected_x_offset = x - items[i].x;
+                        selected_y_offset = y - items[i].y;
                         return i;
                     }
                 }
@@ -194,10 +207,13 @@
             }
 
             function drawAllItems () {
-                var num_Items = items.length;
-                for (var i = 0; i < num_Items; i++) {
-                    var currentItem = items[i];
-                    currentItem.draw();
+                for (var i = 0; i < items.length; i++) {
+                    if (items[i] != selectedItem) {
+                        items[i].draw();
+                    }
+                }
+                if (selectedItem != null) {
+                    selectedItem.draw();
                 }
             }
 
@@ -206,7 +222,7 @@
                     var mousePos = getMousePos(canvas, e);
                     var x = mousePos.x;
                     var y = mousePos.y;
-                    selectedItem.move(x, y);
+                    selectedItem.move(x - selected_x_offset, y - selected_y_offset);
                     drawAllItems();
                     console.log("canvas.onmousemove(): Moved cursor to (%d, %d)", x, y);
                 };
@@ -220,12 +236,42 @@
 
 
             canvas.onmousedown = function(e) {
-                var i = getItemFromMousePos(e);
+                var i = getItemFromMousePos(e)
                 if (i != -1) {
+                    if (selectedItem != null) {
+                        selectedItem.undraw();
+                        selectedItem.sel = false;
+                        selectedItem.draw();
+                    }
                     selectedItem = items[i];
+                    selectedItem.sel = true;
+                    selectedItem.draw();
                     canvas.onmousemove = CanvasOnMouseMove;
+                }else{
+                    selectedItem.undraw();
+                    selectedItem.sel = false;
+                    selectedItem = null;
+                    drawAllItems();
                 }
             };
+
+            document.onkeydown = function(e) {
+                console.log("Keypress keycode=%d", e.keyCode);
+                if (selectedItem != null && e.keyCode == 46) {
+                    console.log("Deleting item: id = %d", selectedItem.id);
+                    selectedItem.undraw();
+                    $.ajax({
+                        url: "${g.createLink(controller: 'PinBoard', action: 'deleteItem')}",
+                        method: "POST",
+                        data: {pinboard_id : ${pinboard.id},
+                               item_id: selectedItem.id},
+                        success: function(data) {
+                            alert("Deleted file id=" + selectedItem.id);
+                            window.location.reload();
+                        }
+                    });
+                }
+            }
 
             //canvas.ondblclick = function(e) {
                 //console.log("canvas.ondblclick
@@ -267,12 +313,16 @@
                         processData: false, // Must be false when using FormData
                         type: 'POST',
                         success: function(data) {
-                            var id = data;
-                            console.log("Assigning new id = %d", id);
-                            var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y, id);
-                            console.log("Finished uploading item (id=%d)", id);
-                            items.push(item);
-                            item.draw();
+                            var id = parseInt(data);
+                            if (id != NaN) {
+                                console.log("Assigning new id = %d", id);
+                                var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y, id);
+                                console.log("Finished uploading item (id=%d)", id);
+                                items.push(item);
+                                item.draw();
+                            } else {
+                                alert(data);
+                            }
                         }
                     });
 
@@ -293,7 +343,7 @@
   <body>
     <div id="login_hdr">
       <div id="hello">
-        <span>Hello, ${user.username}.</span>
+        <span>Hello, ${user.username}.  Welcome to your Pinboard.</span>
         <span id="logout">
           <a href="${g.createLink(controller: 'user', action: 'logout')}">
             Logout
@@ -301,7 +351,7 @@
         </span>
       </div>
       <div id="messages">
-        <p>Simply drag files onto your pinboard to upload them!</p>
+        Simply drag files onto your pinboard to upload them!
       </div>
     </div>
     <div id="main">

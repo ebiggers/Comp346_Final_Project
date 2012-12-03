@@ -48,15 +48,20 @@ class PinBoardController {
 	}
 
 	def deleteItem() {
-		User u = User.get(session.user)
-		int item_id = new Integer(params.item_id).intValue()
-		PinBoard pinboard = getCurrentPinBoard(u)
+        User u = User.get(session.user)
+        int item_id = new Integer(params.item_id).intValue()
+        PinBoard pinboard = getCurrentPinBoard(u)
+        Item item = pinboard.getItemFromId(item_id)
 
-		Item item = pinboard.getItemFromId(item_id)
+        String filePath = grailsApplication.config.pinboard.upload_dir +
+                "/" + u.username + "/" + pinboard.id +
+                "/" + item.dataPath;
+
 		if (item != null) {
+            new File(filePath).delete();
 			pinboard.removeFromItems(item)
 			pinboard.save(failOnError: true)
-			render("Item ${item_id} on pinboard ${pinboard_id} was successfully deleted.");
+			render("Item ${item_id} on pinboard ${pinboard.id} was successfully deleted.");
 		}
 	}
 
@@ -91,7 +96,7 @@ class PinBoardController {
 		String dir = grailsApplication.config.pinboard.upload_dir
 		String username = u.username
 		if (f.getSize() > 10000000) {
-			return render("You cannot upload a file greater than 5MB")
+			return render("You cannot upload a file greater than 10 MB!")
 		}
 		String filename = f.getOriginalFilename()
 
@@ -123,11 +128,9 @@ class PinBoardController {
         PinBoard pinboard = getCurrentPinBoard(u)
         Item item = pinboard.getItemFromId(item_id)
 
-        String dir = grailsApplication.config.pinboard.upload_dir
-        String username = u.username
-        String userFolderName = dir + "/" + username
-        String pinboardFolderName = userFolderName + "/" + pinboard.id
-        String filePath = pinboardFolderName + "/" + item.name
+        String filePath = grailsApplication.config.pinboard.upload_dir +
+                          "/" + u.username + "/" + pinboard.id +
+                          "/" + item.dataPath;
 
         def file = new File(filePath)
 
