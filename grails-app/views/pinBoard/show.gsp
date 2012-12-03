@@ -10,7 +10,6 @@
          * to the "width" and "height" attributes of the canvas. */
           width: ${pinboard.width}px;
           height: ${pinboard.height}px;
-          border: 1px black solid;
       }
     </style>
     <r:require module="jquery"/>
@@ -346,7 +345,7 @@
         </span>
       </div>
       <div id="messages">
-        Simply drag files onto your pinboard to upload them!
+        <p>Simply drag files onto your pinboard to upload them!</p>
       </div>
     </div>
     <div id="main">
