@@ -2,15 +2,15 @@ package pinboard
 
 class ItemType {
 	String typeName
-	String defaultIconPath
+	String iconURL
 
-	ItemType(String typeName, String defaultIconPath) {
+	ItemType(String typeName, String iconURL) {
 		this.typeName = typeName
-		this.defaultIconPath = defaultIconPath
+		this.iconURL = iconURL
 	}
 
 	static constraints = {
 		typeName(nullable: false, blank: false, unique: true)
-		defaultIconPath(nullable: false, blank: false)
+		iconURL(nullable: false, blank: false)
 	}
 }

@@ -39,7 +39,8 @@
                     for (var i = 0; i < num_items; i++) {
                         var item = new Item(data[i].x_pos, data[i].y_pos,
                                             ICON_SIZE_X, ICON_SIZE_Y,
-                                            data[i].id);
+                                            data[i].id, data[i].url,
+                                            data[i].name);
                         item.draw();
                         items.push(item);
                     }
@@ -54,22 +55,29 @@
                 e.preventDefault();
             }
 
-            function Item(x, y, w, h, id) {
+            var url_to_image_obj = {}
+
+            function Item(x, y, w, h, id, url, name) {
                 console.log("Item(): Creating new Item(x = %d, y = %d, " +
-                            "w = %d, h = %d, id = %d)",
-                            x, y, w, h, id);
+                            "w = %d, h = %d, id = %d, url = %s)",
+                            x, y, w, h, id, url);
                 this.x = x;
                 this.y = y;
                 this.w = w;
                 this.h = h;
                 this.id = id;
+                this.url = url;
+                this.name = name;
+                if (!(url in url_to_image_obj)) {
+                    var im = new Image();
+                    url_to_image_obj[url] = im;
+                    im.src = "${g.resource(dir: 'images')}/" + url;
+                }
             }
 
-            var default_img = new Image();
-            default_img.src = "${g.resource(dir: 'images', file: 'Binary-icon.png')}";
             var outstanding_draw_requests = [];
 
-            function DefaultImgOnLoadHandler() {
+            function ImgOnLoadHandler() {
                 var num_images = outstanding_draw_requests.length;
                 for (var i = 0; i < num_images; i++) {
                     outstanding_draw_requests[i].draw();
@@ -77,10 +85,11 @@
             }
 
             Item.prototype.draw = function() {
-                if (default_img.complete) {
-                    ctx.drawImage(default_img, this.x, this.y, this.w, this.h);
+                var im = url_to_image_obj[this.url];
+                if (im) {
+                    ctx.drawImage(im, this.x, this.y, this.w, this.h);
                 } else {
-                    default_img.onload = DefaultImgOnLoadHandler;
+                    im.onload = ImgOnLoadHandler;
                     outstanding_draw_requests.push(this);
                 }
             };
@@ -88,8 +97,6 @@
             Item.prototype.undraw = function() {
                 ctx.clearRect(this.x, this.y, this.w, this.h);
             };
-
-
 
             Item.prototype.move = function(x, y) {
                 if (x != this.x || y != this.y) {
@@ -134,15 +141,6 @@
                     console.log("Downloading item (id = %d)", item.id);
                     window.location = "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}"
                                 + "?pinboard_id=${pinboard.id}&item_id=" + item.id;
-
-                    //$.ajax({
-                        //url: "${g.createLink(controller: 'PinBoard', action: 'downloadFile')}",
-                        //type: 'GET',
-                        //data: { "pinboard_id" : "${pinboard.id}" ,
-                                //"item_id" : item.id },
-                        //success: function(data) {
-                        //}
-                    //});
                 }
             };
 
@@ -221,7 +219,7 @@
             };
 
             document.onkeydown = function(e) {
-                console.log("Keypress keycode=%d", e.keyCode);
+                //console.log("Keypress keycode=%d", e.keyCode);
                 if (selectedItem != null && e.keyCode == 46) {
                     console.log("Deleting item: id = %d", selectedItem.id);
                     selectedItem.undraw();
@@ -277,17 +275,15 @@
                         contentType: false, // Must be false when using FormData
                         processData: false, // Must be false when using FormData
                         type: 'POST',
+                        dataType: 'json',
                         success: function(data) {
-                            var id = parseInt(data);
-                            if (id != NaN) {
-                                console.log("Assigning new id = %d", id);
-                                var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y, id);
-                                console.log("Finished uploading item (id=%d)", id);
-                                items.push(item);
-                                item.draw();
-                            } else {
-                                alert(data);
-                            }
+                            console.log("Assigning new item id=%d", data.id);
+                            var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y,
+                                                data.id, data.url, file.name);
+                            console.log("Finished uploading item (id=%d)",
+                                        data.id);
+                            items.push(item);
+                            item.draw();
                         }
                     });
 

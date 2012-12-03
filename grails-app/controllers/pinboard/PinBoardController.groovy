@@ -42,9 +42,20 @@ class PinBoardController {
     }
 
 	def listItems() {
-		User u = User.get(session.user)
+	    User u = User.get(session.user)
 		PinBoard pinboard = getCurrentPinBoard(u)
-		render pinboard.items as JSON
+
+        render(builder: "json") {
+            array {
+                pinboard.items.each {
+                    dummy(x_pos: it.x_pos,
+                          y_pos: it.y_pos,
+                          id:    it.id,
+                          name:  it.name,
+                          url:   it.type.iconURL)
+                }
+            }
+        }
 	}
 
 	def deleteItem() {
@@ -119,7 +130,10 @@ class PinBoardController {
 		pinboard.addToItems(item)
 		pinboard.save(failOnError: true, flush: true)
 
-		return render("${item.id}") //"File \"${filename}\" has been uploaded!")
+        render(contentType: "text/json") {
+            id = item.id
+            url = item.type.iconURL
+        }
 	}
 
     def downloadFile() {
