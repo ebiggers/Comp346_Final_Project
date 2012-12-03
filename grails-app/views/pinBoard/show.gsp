@@ -63,6 +63,7 @@
                 this.w = w;
                 this.h = h;
                 this.id = id;
+                this.sel = false;
             }
 
             var default_img = new Image();
@@ -83,6 +84,13 @@
                     default_img.onload = DefaultImgOnLoadHandler;
                     outstanding_draw_requests.push(this);
                 }
+
+                if (this.sel == true){
+                    ctx.strokeStyle = '#CC0000';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect((this.x+1), (this.y+1), (this.w-2), (this.h-2));
+                }
+
             };
 
             Item.prototype.undraw = function() {
@@ -213,10 +221,22 @@
 
 
             canvas.onmousedown = function(e) {
-                var i = getItemFromMousePos(e);
+                var i = getItemFromMousePos(e)
                 if (i != -1) {
+                    if (selectedItem != null) {
+                        selectedItem.undraw();
+                        selectedItem.sel = false;
+                        selectedItem.draw();
+                    }
                     selectedItem = items[i];
+                    selectedItem.sel = true;
+                    selectedItem.draw();
                     canvas.onmousemove = CanvasOnMouseMove;
+                }else{
+                    selectedItem.undraw();
+                    selectedItem.sel = false;
+                    selectedItem = null;
+                    drawAllItems();
                 }
             };
 
