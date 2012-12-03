@@ -130,14 +130,9 @@
                 var rect = canvas.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 var y = e.clientY - rect.top;
-                if (typeof window.devicePixelRatio != "undefined") {
-                    // window.devicePixelRatio is used to correct the Retina screen
-                    x /= window.devicePixelRatio;
-                    y /= window.devicePixelRatio;
-                }
                 return {
                     x : x,
-                    y : y,
+                    y : y
                 };
             }
 
