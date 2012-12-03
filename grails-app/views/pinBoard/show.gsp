@@ -249,7 +249,7 @@
 
             document.onkeydown = function(e) {
                 console.log("Keypress keycode=%d", e.keyCode);
-                if (selectedItem != null && e.keyCode == 46) {
+                if (selectedItem != null && (e.keyCode == 46 || e.keyCode == 8)) {
                     console.log("Deleting item: id = %d", selectedItem.id);
                     selectedItem.undraw();
                     $.ajax({
