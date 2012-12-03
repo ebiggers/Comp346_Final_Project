@@ -21,8 +21,8 @@
             var canvas = document.getElementById("pinboard_canvas");
             var ctx = canvas.getContext("2d");
 
-            var ICON_SIZE_X = 30;
-            var ICON_SIZE_Y = 30;
+            var ICON_SIZE_X = 60;
+            var ICON_SIZE_Y = 60;
             var items = [];
             var mousePressed = false;
             var selectedItem = null;
