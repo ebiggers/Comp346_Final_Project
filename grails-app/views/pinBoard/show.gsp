@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" %>
 <!DOCTYPE html>
   <head>
-    <title>Drag and Drop Test</title>
+    <title>Pinboard - ${user.username}</title>
     <meta name="layout" content="main">
     <link rel="stylesheet" href="${resource(dir: 'css', file: 'show.css')}" type="text/css">
     <style>
@@ -10,7 +10,6 @@
          * to the "width" and "height" attributes of the canvas. */
           width: ${pinboard.width}px;
           height: ${pinboard.height}px;
-          border: 1px black solid;
       }
     </style>
     <r:require module="jquery"/>
@@ -294,7 +293,7 @@
   <body>
     <div id="login_hdr">
       <div id="hello">
-        <span>Hello, ${user.username}.  Welcome to your Pinboard.</span>
+        <span>Hello, ${user.username}.</span>
         <span id="logout">
           <a href="${g.createLink(controller: 'user', action: 'logout')}">
             Logout

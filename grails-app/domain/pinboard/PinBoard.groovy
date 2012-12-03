@@ -10,7 +10,7 @@ class PinBoard {
 	static belongsTo = [user: User]
 
 	PinBoard() {
-		width = 960;
+		width = 954;
 		height = 768;
 		name = "Untitled";
 	}

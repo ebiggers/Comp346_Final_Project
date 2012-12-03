@@ -1,0 +1,18 @@
+.body{
+    margin: 50px 240px;
+}
+
+.body form tr{
+    float: right;
+    margin-top: 10px;
+}
+
+.buttons span{
+    float: right;
+}
+
+#create_account_link{
+    text-align: right;
+    padding-right: 50px;
+    padding-bottom: 50px;
+}
