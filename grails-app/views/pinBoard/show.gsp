@@ -10,7 +10,6 @@
          * to the "width" and "height" attributes of the canvas. */
           width: ${pinboard.width}px;
           height: ${pinboard.height}px;
-          border: 1px black solid;
       }
     </style>
     <r:require module="jquery"/>
@@ -22,13 +21,28 @@
             var canvas = document.getElementById("pinboard_canvas");
             var ctx = canvas.getContext("2d");
 
-            var ICON_SIZE_X = 30;
-            var ICON_SIZE_Y = 30;
+            var ICON_SIZE_X = 60;
+            var ICON_SIZE_Y = 60;
             var items = [];
             var mousePressed = false;
             var selectedItem = null;
             var selected_x_offset;
             var selected_y_offset;
+
+            //This deals with the Retina screen for canvas
+            if (window.devicePixelRatio) {
+                var hidefCanvasWidth = $(canvas).attr('width');
+                var hidefCanvasHeight = $(canvas).attr('height');
+                var hidefCanvasCssWidth = hidefCanvasWidth;
+                var hidefCanvasCssHeight = hidefCanvasHeight;
+
+                $(canvas).attr('width', hidefCanvasWidth * window.devicePixelRatio);
+                $(canvas).attr('height', hidefCanvasHeight * window.devicePixelRatio);
+                $(canvas).css('width', hidefCanvasCssWidth);
+                $(canvas).css('height', hidefCanvasCssHeight);
+                ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            }
+
 
             $.ajax({
                 url: "${g.createLink(controller: 'PinBoard', action: 'listItems')}",
@@ -73,6 +87,7 @@
                     url_to_image_obj[url] = im;
                     im.src = "${g.resource(dir: 'images')}/" + url;
                 }
+                this.sel = false;
             }
 
             var outstanding_draw_requests = [];
@@ -92,6 +107,13 @@
                     im.onload = ImgOnLoadHandler;
                     outstanding_draw_requests.push(this);
                 }
+
+                if (this.sel == true){
+                    ctx.strokeStyle = '#CC0000';
+                    ctx.lineWidth = 1;
+                    ctx.strokeRect((this.x+1), (this.y+1), (this.w-2), (this.h-2));
+                }
+
             };
 
             Item.prototype.undraw = function() {
@@ -114,14 +136,9 @@
                 var rect = canvas.getBoundingClientRect();
                 var x = e.clientX - rect.left;
                 var y = e.clientY - rect.top;
-                if (typeof window.devicePixelRatio != "undefined") {
-                    // window.devicePixelRatio is used to correct the Retina screen
-                    x /= window.devicePixelRatio;
-                    y /= window.devicePixelRatio;
-                }
                 return {
                     x : x,
-                    y : y,
+                    y : y
                 };
             }
 
@@ -211,10 +228,22 @@
 
 
             canvas.onmousedown = function(e) {
-                var i = getItemFromMousePos(e);
+                var i = getItemFromMousePos(e)
                 if (i != -1) {
+                    if (selectedItem != null) {
+                        selectedItem.undraw();
+                        selectedItem.sel = false;
+                        selectedItem.draw();
+                    }
                     selectedItem = items[i];
+                    selectedItem.sel = true;
+                    selectedItem.draw();
                     canvas.onmousemove = CanvasOnMouseMove;
+                }else{
+                    selectedItem.undraw();
+                    selectedItem.sel = false;
+                    selectedItem = null;
+                    drawAllItems();
                 }
             };
 
@@ -312,7 +341,7 @@
         </span>
       </div>
       <div id="messages">
-        Simply drag files onto your pinboard to upload them!
+        <p>Simply drag files onto your pinboard to upload them!</p>
       </div>
     </div>
     <div id="main">

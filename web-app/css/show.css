@@ -1,3 +1,23 @@
 #hello > span:last-child {
+    margin-top: -32px;
     float: right;
 }
+
+#hello > span:first-child {
+    font-size: 1.5em;
+    color: #48802c;
+}
+
+#login_hdr div{
+    margin: 10px 20px;
+}
+
+#messages p{
+    text-align: right;
+    color: #48802c;
+}
+
+#pinboard_canvas {
+    border: 3px ridge #48802c;
+}
+

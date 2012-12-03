@@ -19,7 +19,7 @@
 	</head>
 	<body>
 		<div id="grailsLogo" role="banner">
-            <h1>Personal Pinboard</h1>
+            <h1>Pinboard</h1>
         </div>
 		<g:layoutBody/>
 		<div class="footer" role="contentinfo">© 2012 Eric Biggers, Yu Zhao, and Zixiao Wang</div>

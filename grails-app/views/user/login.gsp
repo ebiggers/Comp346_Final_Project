@@ -1,6 +1,7 @@
 <html>
   <head>
     <meta name="layout" content="main" />
+    <link rel="stylesheet" href="${resource(dir: 'css', file: 'login.css')}" type="text/css">
     <title>Login</title>         
   </head>
   <body>
@@ -9,9 +10,6 @@
       <g:if test="${flash.message}">
         <div class="message">${flash.message}</div>
       </g:if>
-      <div id="create_account_link">
-        <p><a href="${g.createLink(action: 'makeNew')}">Create an account</a></p>
-      </div>
       <g:form action="authenticate" method="post" >
         <div class="dialog">
           <table>
@@ -35,6 +33,9 @@
               </tr> 
             </tbody>
           </table>
+        <div id="create_account_link">
+              <p><a href="${g.createLink(action: 'makeNew')}">Create an account</a></p>
+        </div>
         </div>
         <div class="buttons">
           <span class="button">

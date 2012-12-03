@@ -1,6 +1,7 @@
 <html>
   <head>
     <meta name="layout" content="main" />
+    <link rel="stylesheet" href="${resource(dir: 'css', file: 'login.css')}" type="text/css">
     <title>Create Account</title>         
   </head>
   <body>
