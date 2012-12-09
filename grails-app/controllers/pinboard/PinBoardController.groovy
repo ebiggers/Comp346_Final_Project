@@ -95,11 +95,28 @@ class PinBoardController {
 		}
 	}
 
-    //private String extToFileTypeName(String extension) {
-        //switch (extension) {
-            //case /audio/
-        //}
-    //}
+    private String fileNameToFileTypeName(String filename) {
+        int idx = filename.lastIndexOf('.')
+        if (idx == -1)
+            return "Generic File"
+        String extension = filename.substring(idx + 1)
+        switch (extension) {
+            case ~/(?i)wav|mp3|ogg|midi?/:
+                return "Audio"
+            case ~/(?i)jpe?g|png|bmp|tiff|gif/:
+                return "Image"
+            case ~/(?i)pdf/:
+                return "PDF"
+            case ~/(?i)txt/:
+                return "Text"
+            case ~/(?i)mp4|mpe?g|avi|mkv|264|vid|webm/:
+                return "Video"
+            case ~/(?i)docx?|pptx?/:
+                return "Word"
+            default:
+                return "Generic File"
+        }
+    }
 
 	def uploadFile() {
 
@@ -146,7 +163,8 @@ class PinBoardController {
         }
 
         f.transferTo(file)
-		Item item = new Item(filename, "Generic File", x_pos, y_pos)
+		Item item = new Item(filename, fileNameToFileTypeName(filename),
+                             x_pos, y_pos)
 
 		pinboard.addToItems(item)
 		pinboard.save(failOnError: true, flush: true)

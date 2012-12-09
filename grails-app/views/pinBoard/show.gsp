@@ -85,7 +85,7 @@
                 if (!(url in url_to_image_obj)) {
                     var im = new Image();
                     url_to_image_obj[url] = im;
-                    im.src = "${g.resource(dir: 'images')}/" + url;
+                    im.src = "${g.resource(dir: 'images')}" + '/icons/' + url;
                 }
                 this.sel = false;
             }
