@@ -104,14 +104,21 @@ class PinBoardController {
 
 		def f = request.getFile("file")
 
-		String dir = grailsApplication.config.pinboard.upload_dir
+		String dirname = grailsApplication.config.pinboard.upload_dir
 		String username = u.username
 		if (f.getSize() > 10000000) {
-			return render("You cannot upload a file greater than 10 MB!")
+            return render(contentType: "text/json") {
+                error = "You cannot upload a file greater than 10 MB!"
+            }
 		}
 		String filename = f.getOriginalFilename()
 
-		String userFolderName = dir + "/" + username
+        File dir = new File(dirname)
+        if (!dir.exists()) {
+            dir.mkdir()
+        }
+
+		String userFolderName = dirname + "/" + username
 		File userFolder = new File(userFolderName)
 		if (!userFolder.exists()) {
 			userFolder.mkdir()
@@ -123,8 +130,16 @@ class PinBoardController {
 			pinboardFolder.mkdir()
 		}
 
-		f.transferTo(new File(pinboardFolderName + "/" + filename))
+        File file = new File(pinboardFolderName + "/" + filename);
 
+        Item existing_item = pinboard.getItemFromName(filename)
+        if (existing_item != null) {
+            return render(contentType: "text/json") {
+                error = "You already have a file named \"" + filename + "\"!"
+            }
+        }
+
+        f.transferTo(file)
 		Item item = new Item(filename, "Generic File", x_pos, y_pos)
 
 		pinboard.addToItems(item)

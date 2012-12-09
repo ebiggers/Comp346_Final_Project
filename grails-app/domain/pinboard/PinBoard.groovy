@@ -15,12 +15,12 @@ class PinBoard {
 		name = "Untitled";
 	}
 
-    //Item getItemFromFilename(String filename) {
-        //for (Item item in items)
-            //if (item.name == filename)
-                //return item
-        //return null
-    //}
+    Item getItemFromName(String name) {
+        for (Item item in items)
+            if (item.name == name)
+                return item
+        return null
+    }
 
     Item getItemFromId(int item_id) {
         for (Item item in items) {

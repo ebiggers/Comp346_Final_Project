@@ -258,7 +258,7 @@
                         data: {pinboard_id : ${pinboard.id},
                                item_id: selectedItem.id},
                         success: function(data) {
-                            alert("Deleted file id=" + selectedItem.id);
+                            console.log("Deleted file id=%d", selectedItem.id);
                             window.location.reload();
                         }
                     });
@@ -280,8 +280,8 @@
 
                 console.log("canvas.ondrop():  Drop event at (%d, %d)", x, y);
 
-                // If a file was dropped, put a default file icon on the
-                // pinboard, then upload the file using an AJAX call (POST)
+                // If a file was dropped, upload the file using an AJAX call
+                // (POST)
                 if (files.length == 1) {
 
                     var file = files[0];
@@ -306,13 +306,17 @@
                         type: 'POST',
                         dataType: 'json',
                         success: function(data) {
-                            console.log("Assigning new item id=%d", data.id);
-                            var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y,
-                                                data.id, data.url, file.name);
-                            console.log("Finished uploading item (id=%d)",
-                                        data.id);
-                            items.push(item);
-                            item.draw();
+                            if (data.error) {
+                                alert(data.error);
+                            } else {
+                                console.log("Assigning new item id=%d", data.id);
+                                var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y,
+                                                    data.id, data.url, file.name);
+                                console.log("Finished uploading item (id=%d)",
+                                            data.id);
+                                items.push(item);
+                                item.draw();
+                            }
                         }
                     });
 
