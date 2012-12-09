@@ -103,6 +103,14 @@
                 var im = url_to_image_obj[this.url];
                 if (im) {
                     ctx.drawImage(im, this.x, this.y, this.w, this.h);
+                    ctx.textAlign = "center";
+                    var name = this.name;
+                    if (name.length > 20) {
+                        name = name.substring(0, 20) + " ...";
+                    }
+                    ctx.font = "bold 100% sans-serif";
+                    ctx.fillText(name, this.x + this.w / 2,
+                                 this.y + this.h + 15);
                 } else {
                     im.onload = ImgOnLoadHandler;
                     outstanding_draw_requests.push(this);
@@ -199,6 +207,7 @@
             }
 
             function drawAllItems () {
+                ctx.clearRect(0, 0, ${pinboard.width}, ${pinboard.height});
                 for (var i = 0; i < items.length; i++) {
                     if (items[i] != selectedItem) {
                         items[i].draw();

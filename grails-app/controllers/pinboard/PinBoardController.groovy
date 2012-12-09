@@ -95,6 +95,12 @@ class PinBoardController {
 		}
 	}
 
+    //private String extToFileTypeName(String extension) {
+        //switch (extension) {
+            //case /audio/
+        //}
+    //}
+
 	def uploadFile() {
 
 		int x_pos = new Double(params.x_pos).intValue()  //casting to the right type here
