@@ -134,6 +134,7 @@ class PinBoardController {
 		if (f.getSize() > 10000000) {
             return render(contentType: "text/json") {
                 error = "You cannot upload a file greater than 10 MB!"
+                errorType = "FileTooBig"
             }
 		}
 		String filename = f.getOriginalFilename()
@@ -161,6 +162,7 @@ class PinBoardController {
         if (existing_item != null) {
             return render(contentType: "text/json") {
                 error = "You already have a file named \"" + filename + "\"!"
+                errorType = "FileAlreadyExists"
             }
         }
 

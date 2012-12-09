@@ -258,30 +258,112 @@
                 }
             };
 
+            function deleteItem(item, replacementFile,
+                                replacementX, replacementY)
+            {
+                console.log("Deleting item: id = %d", item.id);
+                item.undraw();
+                $.ajax({
+                    url: "${g.createLink(controller: 'PinBoard', action: 'deleteItem')}",
+                    method: "POST",
+                    data: {pinboard_id : ${pinboard.id},
+                           item_id: item.id},
+                    success: function(data) {
+                        console.log("Successfully file id=%d", item.id);
+                        for (var i = 0; i < items.length; i++) {
+                            if (items[i].id == item.id) {
+                                console.log("Remove item idx=%d from array", i);
+                                for (var j = i; j < items.length - 1; j++) {
+                                    items[j] = items[j + 1];
+                                }
+                                if (item == selectedItem)
+                                    selectedItem = null;
+                                items.length = items.length - 1;
+                                drawAllItems();
+                                if (replacementFile) {
+                                    uploadFile(replacementFile, replacementX, replacementY);
+                                }
+                                break;
+                            }
+                        }
+                        //window.location.reload();
+                    }
+                });
+            }
+
+
             document.onkeydown = function(e) {
                 console.log("Keypress keycode=%d", e.keyCode);
                 if (selectedItem != null && (e.keyCode == 46 || e.keyCode == 8)) {
-                    var r=confirm("Do you really want to delete " + selectedItem.name + "?");
-                    if (r==true){
-                        console.log("Deleting item: id = %d", selectedItem.id);
-                        selectedItem.undraw();
-                        $.ajax({
-                            url: "${g.createLink(controller: 'PinBoard', action: 'deleteItem')}",
-                            method: "POST",
-                            data: {pinboard_id : ${pinboard.id},
-                                   item_id: selectedItem.id},
-                            success: function(data) {
-                                console.log("Deleted file id=%d", selectedItem.id);
-                                window.location.reload();
-                            }
-                        });
+                    if (confirm("Do you really want to delete " +
+                                selectedItem.name + "?"))
+                    {
+                        deleteItem(selectedItem);
                     }
                 }
             }
 
-            //canvas.ondblclick = function(e) {
-                //console.log("canvas.ondblclick
-            //}
+            function uploadFile(file, x, y) {
+
+                console.log("canvas.ondrop(): Starting upload of file %s",
+                            file.name);
+
+                // The FormData object simulates submitting a form using the
+                // form-data/multipart enctype (as would be used for an
+                // <input> of type "file")
+                var data = new FormData();
+                data.append("file", file);
+                data.append("x_pos", x);
+                data.append("y_pos", y);
+                data.append("pinboard_id", ${pinboard.id});
+                $.ajax({
+                    url: "${g.createLink(controller: 'PinBoard', action: 'uploadFile')}",
+                    data: data,
+                    cache: false,
+                    contentType: false, // Must be false when using FormData
+                    processData: false, // Must be false when using FormData
+                    type: 'POST',
+                    dataType: 'json',
+                    success: function(data) {
+                        if (data.error) {
+                            if (data.errorType == "FileAlreadyExists") {
+                               if (window.confirm("The file " + file.name + " " +
+                                                  "already exists! " +
+                                                  "Really replace it?"))
+                               {
+                                  var itemToDelete = null;
+                                  for (var i = 0; i < items.length; i++) {
+                                      if (items[i].name == file.name) {
+                                          itemToDelete = items[i];
+                                          break;
+                                      }
+                                  }
+                                  if (itemToDelete == null) {
+                                      alert("An unexpected error occurred");
+                                  } else {
+                                      deleteItem(itemToDelete, file, x, y);
+                                  }
+                               }
+                            } else {
+                                alert(data.error);
+                            }
+                        } else {
+                            console.log("Assigning new item id=%d", data.id);
+                            var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y,
+                                                data.id, data.url, file.name);
+                            console.log("Finished uploading item (id=%d)",
+                                        data.id);
+                            items.push(item);
+                            console.log("onUploadFileResponse(): Added new item " +
+                                        "(there are now %d items)", items.length);
+                            item.draw();
+                        }
+                    },
+                    error: function(data) {
+                        alert("ERROR: Failed to upload file " + file.name + "!");
+                    }
+                });
+            }
 
             canvas.ondrop = function(e) {
                 StopEvent(e);
@@ -297,46 +379,7 @@
                 // If a file was dropped, upload the file using an AJAX call
                 // (POST)
                 if (files.length == 1) {
-
-                    var file = files[0];
-
-                    console.log("canvas.ondrop(): Starting upload of file %s",
-                                file.name);
-
-                    // The FormData object simulates submitting a form using the
-                    // form-data/multipart enctype (as would be used for an
-                    // <input> of type "file")
-                    var data = new FormData();
-                    data.append("file", file);
-                    data.append("x_pos", x);
-                    data.append("y_pos", y);
-                    data.append("pinboard_id", ${pinboard.id});
-                    $.ajax({
-                        url: "${g.createLink(controller: 'PinBoard', action: 'uploadFile')}",
-                        data: data,
-                        cache: false,
-                        contentType: false, // Must be false when using FormData
-                        processData: false, // Must be false when using FormData
-                        type: 'POST',
-                        dataType: 'json',
-                        success: function(data) {
-                            if (data.error) {
-                                alert(data.error);
-                            } else {
-                                console.log("Assigning new item id=%d", data.id);
-                                var item = new Item(x, y, ICON_SIZE_X, ICON_SIZE_Y,
-                                                    data.id, data.url, file.name);
-                                console.log("Finished uploading item (id=%d)",
-                                            data.id);
-                                items.push(item);
-                                item.draw();
-                            }
-                        }
-                    });
-
-                    console.log("canvas.ondrop(): Added new item (there are now %d items)",
-                                items.length);
-
+                    uploadFile(files[0], x, y);
                 } else {
                     if (files.length == 0) {
                         console.log("No files dropped!");
