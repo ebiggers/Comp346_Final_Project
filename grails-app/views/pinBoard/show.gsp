@@ -261,18 +261,21 @@
             document.onkeydown = function(e) {
                 console.log("Keypress keycode=%d", e.keyCode);
                 if (selectedItem != null && (e.keyCode == 46 || e.keyCode == 8)) {
-                    console.log("Deleting item: id = %d", selectedItem.id);
-                    selectedItem.undraw();
-                    $.ajax({
-                        url: "${g.createLink(controller: 'PinBoard', action: 'deleteItem')}",
-                        method: "POST",
-                        data: {pinboard_id : ${pinboard.id},
-                               item_id: selectedItem.id},
-                        success: function(data) {
-                            console.log("Deleted file id=%d", selectedItem.id);
-                            window.location.reload();
-                        }
-                    });
+                    var r=confirm("Do you really want to delete " + selectedItem.name + "?");
+                    if (r==true){
+                        console.log("Deleting item: id = %d", selectedItem.id);
+                        selectedItem.undraw();
+                        $.ajax({
+                            url: "${g.createLink(controller: 'PinBoard', action: 'deleteItem')}",
+                            method: "POST",
+                            data: {pinboard_id : ${pinboard.id},
+                                   item_id: selectedItem.id},
+                            success: function(data) {
+                                console.log("Deleted file id=%d", selectedItem.id);
+                                window.location.reload();
+                            }
+                        });
+                    }
                 }
             }
 
