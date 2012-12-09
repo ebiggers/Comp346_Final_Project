@@ -130,10 +130,8 @@
 
             Item.prototype.move = function(x, y) {
                 if (x != this.x || y != this.y) {
-                    this.undraw();
                     this.x = Math.round(x);
                     this.y = Math.round(y);
-                    this.draw();
                 }
             };
 
