@@ -87,7 +87,6 @@
                     url_to_image_obj[url] = im;
                     im.src = "${g.resource(dir: 'images')}" + '/icons/' + url;
                 }
-                this.sel = false;
             }
 
             var outstanding_draw_requests = [];
@@ -116,7 +115,7 @@
                     outstanding_draw_requests.push(this);
                 }
 
-                if (this.sel == true){
+                if (this == selectedItem) {
                     ctx.strokeStyle = '#CC0000';
                     ctx.lineWidth = 1;
                     ctx.strokeRect((this.x+1), (this.y+1), (this.w-2), (this.h-2));
@@ -237,19 +236,13 @@
             canvas.onmousedown = function(e) {
                 var i = getItemFromMousePos(e)
                 if (i != -1) {
-                    if (selectedItem != null) {
-                        selectedItem.undraw();
-                        selectedItem.sel = false;
-                        selectedItem.draw();
+                    if (items[i] != selectedItem) {
+                        selectedItem = items[i];
+                        drawAllItems();
                     }
-                    selectedItem = items[i];
-                    selectedItem.sel = true;
-                    selectedItem.draw();
                     canvas.onmousemove = CanvasOnMouseMove;
                 } else {
                     if (selectedItem != null) {
-                        selectedItem.undraw();
-                        selectedItem.sel = false;
                         selectedItem = null;
                         drawAllItems();
                     }
