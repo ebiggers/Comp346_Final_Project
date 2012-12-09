@@ -108,7 +108,7 @@
                     if (name.length > 20) {
                         name = name.substring(0, 20) + " ...";
                     }
-                    ctx.font = "bold 100% sans-serif";
+                    //ctx.font = "bold 100% sans-serif";
                     ctx.fillText(name, this.x + this.w / 2,
                                  this.y + this.h + 15);
                 } else {
