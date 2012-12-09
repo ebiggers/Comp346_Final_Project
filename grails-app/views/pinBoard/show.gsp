@@ -101,7 +101,7 @@
 
             Item.prototype.draw = function() {
                 var im = url_to_image_obj[this.url];
-                if (im) {
+                if (im && im.complete) {
                     ctx.drawImage(im, this.x, this.y, this.w, this.h);
                     ctx.textAlign = "center";
                     var name = this.name;
