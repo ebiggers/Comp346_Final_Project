@@ -239,11 +239,13 @@
                     selectedItem.sel = true;
                     selectedItem.draw();
                     canvas.onmousemove = CanvasOnMouseMove;
-                }else{
-                    selectedItem.undraw();
-                    selectedItem.sel = false;
-                    selectedItem = null;
-                    drawAllItems();
+                } else {
+                    if (selectedItem != null) {
+                        selectedItem.undraw();
+                        selectedItem.sel = false;
+                        selectedItem = null;
+                        drawAllItems();
+                    }
                 }
             };
 
