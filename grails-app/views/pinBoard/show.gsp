@@ -108,7 +108,7 @@
                     if (name.length > 20) {
                         name = name.substring(0, 20) + " ...";
                     }
-                    ctx.font = "bold 100% sans-serif";
+
                     ctx.fillText(name, this.x + this.w / 2,
                                  this.y + this.h + 15);
                 } else {
@@ -261,6 +261,8 @@
             document.onkeydown = function(e) {
                 console.log("Keypress keycode=%d", e.keyCode);
                 if (selectedItem != null && (e.keyCode == 46 || e.keyCode == 8)) {
+                    var r=confirm("Do you really want to delete " + selectedItem.name + "?");
+                    if (r==true){
                     console.log("Deleting item: id = %d", selectedItem.id);
                     selectedItem.undraw();
                     $.ajax({
@@ -273,8 +275,9 @@
                             window.location.reload();
                         }
                     });
+                    }
                 }
-            }
+            };
 
             //canvas.ondblclick = function(e) {
                 //console.log("canvas.ondblclick
