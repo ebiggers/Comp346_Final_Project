@@ -101,6 +101,8 @@ class PinBoardController {
             return "Generic File"
         String extension = filename.substring(idx + 1)
         switch (extension) {
+            case ~/(?i)zip|tar|gz|bzip2|7z|bz2|iso|o|cpio|a|lz|lzma|xz|ace|wim|apk|jar|cab|dmg|lzx|partimg|rar/:
+                return "Archive"
             case ~/(?i)wav|mp3|ogg|midi?/:
                 return "Audio"
             case ~/(?i)jpe?g|png|bmp|tiff|gif/:
